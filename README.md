@@ -78,3 +78,4 @@ Copyright and license
 Copyright (c) 2014-2016 George Merticariu, Dimitar Misev, Peter Baumann.
 
 Code released under [the MIT license] (https://raw.githubusercontent.com/adbms-benchmark/storage/master/LICENSE).
+
