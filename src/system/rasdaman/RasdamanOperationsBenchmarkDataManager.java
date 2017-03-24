@@ -1,36 +1,36 @@
 package system.rasdaman;
 
 import benchmark.BenchmarkContext;
-import benchmark.caching.CachingBenchmarkDataManager;
+import benchmark.operations.OperationsBenchmarkDataManager;
 import util.DomainUtil;
 
 import java.text.MessageFormat;
 import java.util.List;
 
 /**
- * @author Dimitar Misev <misev@rasdaman.com>
+ * Created by danut on 23.03.17.
  */
-public class RasdamanCachingBenchmarkDataManager extends CachingBenchmarkDataManager<RasdamanSystem> {
-    
+public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkDataManager<RasdamanSystem> {
+
     private static final int TYPE_SIZE = 8;
     private static final String TYPE_MDD = "DoubleImage";
     private static final String TYPE_SET = "DoubleSet";
-    
-    public RasdamanCachingBenchmarkDataManager(RasdamanSystem systemController,
-            RasdamanQueryExecutor queryExecutor, BenchmarkContext benchmarkContext) {
+
+    public RasdamanOperationsBenchmarkDataManager(RasdamanSystem systemController,
+                                               RasdamanQueryExecutor queryExecutor, BenchmarkContext benchmarkContext) {
         super(systemController, queryExecutor, benchmarkContext);
     }
 
     @Override
     public long loadData() throws Exception {
         long totalTime = 0;
-        
+
         List<String> sliceFilePaths = getSliceFilePaths(benchmarkContext);
         for (int i = 0; i < sliceFilePaths.size(); i++) {
             String arrayName = benchmarkContext.getArrayNameN(i);
-            
+
             queryExecutor.executeTimedQuery(String.format("CREATE COLLECTION %s %s", arrayName, TYPE_SET));
-            
+
             long tileUpperBound = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), benchmarkContext.getTileSize() / TYPE_SIZE);
             String insertQuery = String.format("INSERT INTO %s VALUES $1 TILING REGULAR [0:%d,0:%d] TILE SIZE %d",
                     arrayName, tileUpperBound - 1, tileUpperBound - 1, tileUpperBound * tileUpperBound * TYPE_SIZE);
@@ -55,5 +55,4 @@ public class RasdamanCachingBenchmarkDataManager extends CachingBenchmarkDataMan
         }
         return ret;
     }
-
 }
