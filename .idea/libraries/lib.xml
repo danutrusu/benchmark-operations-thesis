@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hsqldb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/monetdb-jdbc-2.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-simple-1.7.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/rasj.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/JSAP-2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

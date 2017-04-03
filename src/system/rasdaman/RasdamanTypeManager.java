@@ -5,8 +5,9 @@
  */
 package system.rasdaman;
 
-import java.text.MessageFormat;
 import util.Pair;
+
+import java.text.MessageFormat;
 
 /**
  * Create/drop types in rasdaman.
@@ -16,6 +17,8 @@ import util.Pair;
 public class RasdamanTypeManager {
     
     private final RasdamanQueryExecutor queryExecutor;
+    private static int SET_TYPE = 0;
+    private static int MDD_TYPE = 0;
 
     public RasdamanTypeManager(RasdamanQueryExecutor queryExecutor) {
         this.queryExecutor = queryExecutor;
@@ -71,7 +74,7 @@ public class RasdamanTypeManager {
         queryExecutor.executeTimedQuery(mddTypeDefinition);
         return mddTypeName;
     }
-    
+
     public String getSetTypeName(int noOfDimensions, String baseTypeName) {
         String setTypeName = MessageFormat.format("B_SET_{0}_{1}", baseTypeName, noOfDimensions);
         return setTypeName;
@@ -88,6 +91,54 @@ public class RasdamanTypeManager {
         String baseTypeName = createBaseType(baseTypes);
         String mddTypeName = createMddType(noOfDimensions, baseTypeName);
         String setTypeName = createSetType(noOfDimensions, baseTypeName, mddTypeName);
+        return Pair.of(mddTypeName, setTypeName);
+    }
+
+
+
+
+//    public String createOperationsBaseType(String... baseTypes) throws Exception {
+//        String baseTypeName = getBaseTypeName(baseTypes);
+//        if (baseTypes.length > 0) {
+//            String baseTypeDefinition = MessageFormat.format("create type {0} as ({1})", baseTypeName, getBands(baseTypes));
+//            queryExecutor.executeTimedQuery(baseTypeDefinition);
+//        }
+//        return baseTypeName;
+//    }
+    public String getOperationsMddTypeName(int noOfDimensions, String baseTypeName) {
+        String mddTypeName = MessageFormat.format("B_MDD_{0}_{1}_{2}", baseTypeName, noOfDimensions, MDD_TYPE++);
+        return mddTypeName;
+    }
+
+    public String createOperationsMddType(int noOfDimensions, String baseTypeName) throws Exception {
+        String mddTypeName = getOperationsMddTypeName(noOfDimensions, baseTypeName);
+        String mddTypeDefinition = MessageFormat.format("create type {0} as {1} mdarray [ {2} ]", mddTypeName, baseTypeName, getDimNames(noOfDimensions));
+        queryExecutor.executeTimedQuery(mddTypeDefinition);
+        return mddTypeName;
+    }
+
+    public String getOperationsSetTypeName(int noOfDimensions, String baseTypeName) {
+        String setTypeName = MessageFormat.format("B_SET_{0}_{1}_{2}", baseTypeName, noOfDimensions, SET_TYPE++);
+        SET_TYPE++;
+        return setTypeName;
+    }
+
+    public String createOperationsSetType(int noOfDimensions, String baseTypeName, String mddTypeName) throws Exception {
+        String setTypeName = getOperationsSetTypeName(noOfDimensions, baseTypeName);
+        String setTypeDefinition = MessageFormat.format("create type {0} as set ({1})", setTypeName, mddTypeName);
+        queryExecutor.executeTimedQuery(setTypeDefinition);
+        return setTypeName;
+    }
+
+    public Pair<String, String> createOperationsType(int noOfDimensions, String... baseTypes) throws Exception {
+        String baseTypeName;
+        if(baseTypes.length > 1) {
+            baseTypeName = createBaseType(baseTypes);
+        }  else {
+            baseTypeName = baseTypes[0];
+        }
+        String mddTypeName = createOperationsMddType(noOfDimensions, baseTypeName);
+        String setTypeName = createOperationsSetType(noOfDimensions, baseTypeName, mddTypeName);
         return Pair.of(mddTypeName, setTypeName);
     }
 

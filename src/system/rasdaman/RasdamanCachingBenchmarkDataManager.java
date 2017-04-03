@@ -1,12 +1,11 @@
 package system.rasdaman;
 
-import benchmark.caching.CachingBenchmarkDataManager;
 import benchmark.BenchmarkContext;
-import benchmark.caching.CachingBenchmarkContext;
+import benchmark.caching.CachingBenchmarkDataManager;
+import util.DomainUtil;
+
 import java.text.MessageFormat;
 import java.util.List;
-import util.DomainUtil;
-import util.Pair;
 
 /**
  * @author Dimitar Misev <misev@rasdaman.com>

@@ -1,16 +1,12 @@
 package system.rasdaman;
 
 
-import benchmark.Benchmark;
-import benchmark.BenchmarkQuery;
-import benchmark.BenchmarkSession;
-import benchmark.QueryGenerator;
-import benchmark.BenchmarkContext;
+import benchmark.*;
+import data.DomainGenerator;
+import util.Pair;
 
 import java.text.MessageFormat;
 import java.util.List;
-
-import util.Pair;
 
 /**
  * @author George Merticariu
@@ -20,6 +16,70 @@ public class RasdamanQueryGenerator extends QueryGenerator {
     public RasdamanQueryGenerator(BenchmarkContext benchmarkContext) {
         super(benchmarkContext);
     }
+
+    String getQuery(int dimension, String arrayName, String aggregateFunc, int start, long stop) {
+        String subsetQuery;
+        switch (dimension) {
+            case 1: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d]) FROM %s as c"; break;
+            case 2: subsetQuery =  "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d]) FROM %s as c"; break;
+            case 3: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d]) FROM %s as c";break;
+            case 4: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
+            case 5: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
+            case 6: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
+            case 7: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
+            case 8: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
+            default: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d]) FROM %s as c";break;
+        }
+
+        switch (dimension) {
+            case 1: return String.format(subsetQuery, start, stop, arrayName);
+            case 2: return String.format(subsetQuery, start, stop, start, stop, arrayName);
+            case 3: return String.format(subsetQuery, start, stop, start, stop, start, stop, arrayName);
+            case 4: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, arrayName);
+            case 5: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
+            case 6: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
+            case 7: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
+            case 8: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
+            default: return String.format(subsetQuery, start, stop, start, stop, arrayName);
+        }
+
+    }
+    @Override
+    public Benchmark getOperationsBenchmark() {
+        Benchmark ret = new Benchmark();
+
+        {
+//            String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
+            String[] aggregateFuncs = {"min_cells"};
+
+            for (String aggregateFunc : aggregateFuncs) {
+                int arrayDimensionality = benchmarkContext.getArrayDimensionality();
+                String arrayName = benchmarkContext.getArrayName();
+                DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
+                List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
+                long upperBoundary = domainBoundaries.get(0).getSecond();
+//                System.out.println(domainBoundaries.get(0));
+
+                BenchmarkSession benchmarkSession = new BenchmarkSession(
+                        String.format("subset [0, i], with i = [0, %d] and aggregate function: %s", upperBoundary, aggregateFunc));
+                for (int i = 0; i < upperBoundary; i++) {
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, aggregateFunc, 0, i)));
+                }
+                ret.add(benchmarkSession);
+
+                benchmarkSession = new BenchmarkSession(
+                        String.format("subset [i, %d], with i = [0, %d] and aggregate function: %s", arrayDimensionality, arrayDimensionality, aggregateFunc));
+                for (int i = 0; i <= upperBoundary; i++) {
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, aggregateFunc, i, upperBoundary)));
+                }
+                ret.add(benchmarkSession);
+
+            }
+        }
+
+        return ret;
+    }
+
 
     @Override
     public Benchmark getCachingBenchmark() {

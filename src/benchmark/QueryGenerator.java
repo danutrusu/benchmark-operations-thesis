@@ -3,9 +3,10 @@ package benchmark;
 import benchmark.sqlmda.BenchmarkContextGenerator;
 import benchmark.sqlmda.BenchmarkContextJoin;
 import data.QueryDomainGenerator;
+import util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
-import util.Pair;
 
 /**
  * Generate benchmark sessions. Subclasses override it with details for specific
@@ -52,11 +53,17 @@ public abstract class QueryGenerator {
             return getStorageBenchmark();
         } else if (this.benchmarkContext.isCachingBenchmark()) {
             return getCachingBenchmark();
+        } else if (this.benchmarkContext.isOperationsBenchmark()) {
+            return getOperationsBenchmark();
         } else {
             throw new RuntimeException("unknown benchmark type: " + this.benchmarkContext.getBenchmarkType());
         }
     }
-    
+
+    public Benchmark getOperationsBenchmark() {
+        throw new UnsupportedOperationException("must be implemented by the subclass");
+    }
+
     public Benchmark getStorageBenchmark() {
         throw new UnsupportedOperationException("must be implemented by the subclass");
     }
