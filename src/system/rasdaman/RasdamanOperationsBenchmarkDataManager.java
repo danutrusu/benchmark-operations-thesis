@@ -119,6 +119,7 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
                 benchmarkContext.getArrayName(), fileSize*slices, chunkSize + 1l, benchmarkContext.getArrayDimensionality(), insertTime));
 
 //        return insertTime;
+
     }
 
     @Override

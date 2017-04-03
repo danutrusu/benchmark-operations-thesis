@@ -5,6 +5,10 @@ import benchmark.Driver;
 import com.martiansoftware.jsap.*;
 import util.DomainUtil;
 import util.Pair;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.SimpleJSAP;
+
 
 import java.io.IOException;
 
@@ -61,7 +65,6 @@ public class OperationsBenchmarkDriver extends Driver {
     protected int runBenchmark(JSAPResult config) throws IOException {
         int exitCode = 0;
 
-
         double maxSelectSize = config.getDouble("max_select_size");
         Pair<Long, String> tileSize = DomainUtil.parseSize(config.getString("tilesize"));
         int queries = config.getInt("queries");
@@ -76,7 +79,6 @@ public class OperationsBenchmarkDriver extends Driver {
         benchmarkContext.setGenerateData(config.getBoolean("generate"));
         benchmarkContext.setDisableBenchmark(config.getBoolean("nobenchmark"));
         benchmarkContext.setDisableSystemRestart(config.getBoolean("norestart"));
-//        benchmarkContext.setCleanQuery(config.getBoolean("cleanquery"));
 
         String[] systems = config.getStringArray("system");
         String[] configs = config.getStringArray("config");

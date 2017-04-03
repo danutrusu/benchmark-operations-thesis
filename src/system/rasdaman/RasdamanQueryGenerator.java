@@ -80,6 +80,49 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         return ret;
     }
 
+//
+//    @Override
+//    public Benchmark getOperationsBenchmark() {
+//        Benchmark ret = new Benchmark();
+//
+//        {
+//            String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
+//            for (String aggregateFunc : aggregateFuncs) {
+//                String subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d,%d:%d]) FROM %s as c";
+//                BenchmarkSession benchmarkSession = new BenchmarkSession("subset window lower left to lower right, " + aggregateFunc);
+//                for (int i = 0; i < 8; i++) {
+//                    int origin = i * 500;
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+//                            subsetQuery, origin, 3999 + origin, 0, 3999, benchmarkContext.getArrayName0())));
+//                }
+//                ret.add(benchmarkSession);
+//                benchmarkSession = new BenchmarkSession("subset window lower left to upper right, " + aggregateFunc);
+//                for (int i = 0; i < 8; i++) {
+//                    int origin = i * 500;
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+//                            subsetQuery, origin, 3999 + origin, origin, 3999 + origin, benchmarkContext.getArrayName0())));
+//                }
+//                ret.add(benchmarkSession);
+//                benchmarkSession = new BenchmarkSession("subset window zoom in, " + aggregateFunc);
+//                for (int i = 0; i < 8; i++) {
+//                    int zoom = i * 500;
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+//                            subsetQuery, zoom, 7999 - zoom, zoom, 7999 - zoom, benchmarkContext.getArrayName0())));
+//                }
+//                ret.add(benchmarkSession);
+//                benchmarkSession = new BenchmarkSession("subset window zoom out, " + aggregateFunc);
+//                for (int i = 7; i >= 0; i--) {
+//                    int zoom = i * 500;
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+//                            subsetQuery, zoom, 7999 - zoom, zoom, 7999 - zoom, benchmarkContext.getArrayName0())));
+//                }
+//                ret.add(benchmarkSession);
+//            }
+//        }
+//
+//        return ret;
+//    }
+
 
     @Override
     public Benchmark getCachingBenchmark() {
