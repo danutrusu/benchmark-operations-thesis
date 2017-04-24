@@ -6,6 +6,8 @@ import data.DomainGenerator;
 import util.Pair;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,52 +19,116 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         super(benchmarkContext);
     }
 
-    String getQuery(int dimension, String arrayName, String aggregateFunc, int start, long stop) {
+    private String getQuery(int dimension, String arrayName, String function, int start, long stop) {
         String subsetQuery;
-        switch (dimension) {
-            case 1: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d]) FROM %s as c"; break;
-            case 2: subsetQuery =  "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d]) FROM %s as c"; break;
-            case 3: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d]) FROM %s as c";break;
-            case 4: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
-            case 5: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
-            case 6: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
-            case 7: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
-            case 8: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";break;
-            default: subsetQuery = "SELECT " + aggregateFunc + "(c[%d:%d, %d:%d]) FROM %s as c";break;
-        }
+        List<String> logicalFunctions = new ArrayList<>(Arrays.asList("and", "or", "xor", "not"));
+        List<String> aggregateFunctions = new ArrayList<>(Arrays.asList("min_cells", "max_cells", "add_cells", "avg_cells"));
 
-        switch (dimension) {
-            case 1: return String.format(subsetQuery, start, stop, arrayName);
-            case 2: return String.format(subsetQuery, start, stop, start, stop, arrayName);
-            case 3: return String.format(subsetQuery, start, stop, start, stop, start, stop, arrayName);
-            case 4: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, arrayName);
-            case 5: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
-            case 6: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
-            case 7: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
-            case 8: return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
-            default: return String.format(subsetQuery, start, stop, start, stop, arrayName);
+        if (aggregateFunctions.contains(function)) {
+            switch (dimension) {
+                case 1:
+                    subsetQuery = "SELECT " + function + "(c[%d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, arrayName);
+                case 2:
+                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
+                case 3:
+                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, start, stop, arrayName);
+                case 4:
+                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, arrayName);
+//                case 5:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+//                    break;
+//                case 6:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+//                    break;
+//                case 7:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+//                    break;
+//                case 8:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+                default:
+                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
+            }
         }
-
+//        else if (logicalFunctions.contains(function)) {
+        else {
+            switch (dimension) {
+                case 1:
+                    subsetQuery = "SELECT (c[%d:%d]) " + function + "(c[%d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
+                case 2:
+                    subsetQuery = "SELECT (c[%d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, arrayName);
+                case 3:
+                    subsetQuery = "SELECT (c[%d:%d, %d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d, %d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
+                case 4:
+                    subsetQuery = "SELECT ((c[%d:%d, %d:%d, %d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d, %d:%d, %d:%d])) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop,
+                            start, stop, start, stop, start, stop, start, stop, arrayName);
+//                case 5:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+//                    break;
+//                case 6:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+//                    break;
+//                case 7:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+//                    break;
+//                case 8:
+//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
+//                    break;
+                default:
+                    subsetQuery = "SELECT (c[%d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d]) FROM %s as c";
+                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
+            }
+        }
     }
+
     @Override
     public Benchmark getOperationsBenchmark() {
         Benchmark ret = new Benchmark();
+        int arrayDimensionality = benchmarkContext.getArrayDimensionality();
+        String arrayName = benchmarkContext.getArrayName();
+        DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
+        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
+        long upperBoundary = domainBoundaries.get(0).getSecond();
+/*
+        //TODO joins, nested queries, sorting.
+        //SELECT
+        {
+//            System.out.println("Start test SELECT operation");
+            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
+            String query = "SELECT c FROM %s AS c";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+//            System.out.println("Stop test SELECT operation");
+        }
+
+        //CASTING
+        {
+//            System.out.println("Start test SELECT operation");
+            BenchmarkSession benchmarkSession = new BenchmarkSession("CASTING");
+            String query = "SELECT (float)c FROM %s AS c";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+//            System.out.println("Stop test SELECT operation");
+        }
 
         {
-//            String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
-            String[] aggregateFuncs = {"min_cells"};
-
+//            System.out.println("Start test aggregate min, max, add, avg operation");
+            String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
             for (String aggregateFunc : aggregateFuncs) {
-                int arrayDimensionality = benchmarkContext.getArrayDimensionality();
-                String arrayName = benchmarkContext.getArrayName();
-                DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
-                List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
-                long upperBoundary = domainBoundaries.get(0).getSecond();
+//                long upperBoundary = domainBoundaries.get(0).getSecond();
 //                System.out.println(domainBoundaries.get(0));
 
                 BenchmarkSession benchmarkSession = new BenchmarkSession(
                         String.format("subset [0, i], with i = [0, %d] and aggregate function: %s", upperBoundary, aggregateFunc));
-                for (int i = 0; i < upperBoundary; i++) {
+                for (int i = 0; i <= upperBoundary; i++) {
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, aggregateFunc, 0, i)));
                 }
                 ret.add(benchmarkSession);
@@ -75,6 +141,81 @@ public class RasdamanQueryGenerator extends QueryGenerator {
                 ret.add(benchmarkSession);
 
             }
+//            System.out.println("Stop test aggregate min, max, add, avg operation");
+        }
+*/
+        {
+//            System.out.println("Start test trigonometric operations");
+            String[][] unaryFuncs = {{"sqrt", "abs(c)"}, {"sin", "c"}, {"cos", "c"}, {"tan", "c"},
+//            {"acos", "c"}, {"acos", "c"}, {"asin", "c"}
+                };
+            for (String[] unaryFunc : unaryFuncs) {
+                String func = unaryFunc[0];
+                BenchmarkSession benchmarkSession = new BenchmarkSession(func);
+                String query = "SELECT %s FROM %s AS c";
+                String expr = unaryFunc[1];
+                for (int i = 0; i < 5; i++) {
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
+                    expr = func + "(" + expr + ")";
+                }
+                ret.add(benchmarkSession);
+            }
+//            System.out.println("Stop test trigonometric operations");
+        }
+
+        {
+//            System.out.println("Start test logical operations");
+            String[][] logicalFuncs = {{"Logical AND", "and"}, {"Logical OR", "or"}, {"Logical XOR", "xor"}};
+            for (String[] logicalFunc : logicalFuncs) {
+                String func = logicalFunc[0];
+                BenchmarkSession benchmarkSession = new BenchmarkSession(func);
+                String expr = logicalFunc[1];
+                for (int i = 0; i <= upperBoundary; i++) {
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, expr, 0, i)));
+                }
+                ret.add(benchmarkSession);
+            }
+//            System.out.println("Stop test logical operations");
+        }
+
+        {
+//            System.out.println("Start test algebraic operations");
+            String[][] binaryFuncs = {{"multiplication", "*"}, {"division", "/"}, {"addition", "+"}, {"subtraction", "-"}};
+            for (String[] binaryFunc : binaryFuncs) {
+                BenchmarkSession benchmarkSession = new BenchmarkSession(binaryFunc[0]);
+                String query = "SELECT min_cells(%s) FROM %s AS c";
+                String expr = "c";
+                String op = binaryFunc[1];
+                for (int i = 0; i < 10; i++) {
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
+                    expr = expr + op + "c";
+                }
+                ret.add(benchmarkSession);
+            }
+//            System.out.println("Stop test algebraic operations");
+        }
+
+        {
+//            System.out.println("Start test comparison operation");
+            String[][] comparisonFuncs = {{"less than", "<"}, {"greater than", ">"}, {"less than or equal to", "<="},
+                    {"greater than or equal to", ">="}, {"equal to", "="}, {"not equal to", "!="}};
+            for (String[] comparisonFunc : comparisonFuncs) {
+                BenchmarkSession benchmarkSession = new BenchmarkSession(comparisonFunc[0]);
+                String query = "SELECT count_cells(%s) FROM %s AS c";
+                String expr = "";
+                String op = comparisonFunc[1];
+                for (int i = 0; i < 10; i++) {
+                    String currExpr = "(c" + op + i + ")";
+                    if (expr.isEmpty()) {
+                        expr = currExpr;
+                    } else {
+                        expr = expr + " and " + currExpr;
+                    }
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
+                }
+                ret.add(benchmarkSession);
+             }
+//            System.out.println("Stop test comparison operation");
         }
 
         return ret;
