@@ -1,8 +1,8 @@
 package system.scidb;
 
 import benchmark.BenchmarkContext;
-import benchmark.DataManager;
 import benchmark.QueryExecutor;
+import benchmark.operations.OperationsBenchmarkDataManager;
 import data.RandomDataGenerator;
 import util.DomainUtil;
 import util.IO;
@@ -16,7 +16,10 @@ import java.util.List;
 /**
  * Created by danut on 25.04.17.
  */
-public class SciDBOperationsBenchmarkDataManager extends DataManager<SciDBSystem> {
+public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkDataManager<SciDBSystem> {
+
+    private static final int TYPE_SIZE = 8;
+    private static final String TYPE_BASE = "double";
 
     public SciDBOperationsBenchmarkDataManager(SciDBSystem systemController,
                                             QueryExecutor<SciDBSystem> queryExecutor, BenchmarkContext benchmarkContext) {
@@ -25,18 +28,25 @@ public class SciDBOperationsBenchmarkDataManager extends DataManager<SciDBSystem
 
     @Override
     public long dropData() throws Exception {
-        String dropCollectionQuery = MessageFormat.format("DROP ARRAY {0}", benchmarkContext.getArrayName());
-        return queryExecutor.executeTimedQuery(dropCollectionQuery);
+        long totalTime = 0;
+
+        for (int i = 0; i < ARRAY_NO; i++) {
+            String arrayName = benchmarkContext.getArrayNameN(i);
+            String dropCollectionQuery = MessageFormat.format("remove({0});", arrayName);
+            totalTime += queryExecutor.executeTimedQuery(dropCollectionQuery);
+        }
+
+        return totalTime;
     }
 
     @Override
     public long loadData() throws Exception {
         StopWatch timer = new StopWatch();
-        loadStorageBenchmarkData();
+        loadOperationsBenchmarkData();
         return timer.getElapsedTime();
     }
 
-    private void loadStorageBenchmarkData() throws Exception {
+    private void loadOperationsBenchmarkData() throws Exception {
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
         long fileSize = domainGenerator.getFileSize(domainBoundaries);
 
