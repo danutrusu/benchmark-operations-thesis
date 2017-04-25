@@ -79,126 +79,162 @@ public class SciDBAFLQueryGenerator extends QueryGenerator {
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
         long upperBoundary = domainBoundaries.get(0).getSecond();
 
-        //TODO joins, nested queries, sorting.
-
-        //SELECT
-        {
-//            System.out.println("Start test SELECT operation");
-            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
-            String query = "SELECT c FROM %s AS c, %s as d";
-            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-            ret.add(benchmarkSession);
-//            System.out.println("Stop test SELECT operation");
-        }
-
-        //CASTING
-        {
-//            System.out.println("Start test SELECT operation");
-            BenchmarkSession benchmarkSession = new BenchmarkSession("CASTING");
-            String query = "SELECT (float)c FROM %s AS c";
-            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-            ret.add(benchmarkSession);
-//            System.out.println("Stop test SELECT operation");
-        }
 
         {
-//            System.out.println("Start test aggregate min, max, add, avg operation");
-            String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
+            String[] aggregateFuncs = {"min", "max", "sum", "avg"};
             for (String aggregateFunc : aggregateFuncs) {
-//                long upperBoundary = domainBoundaries.get(0).getSecond();
-//                System.out.println(domainBoundaries.get(0));
-
-                BenchmarkSession benchmarkSession = new BenchmarkSession(
-                        String.format("subset [0, i], with i = [0, %d] and aggregate function: %s", upperBoundary, aggregateFunc));
-                for (int i = 0; i <= upperBoundary; i++) {
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, aggregateFunc, 0, i)));
+                String subsetQuery = "aggregate( between( %s, %d, %d, %d, %d ), " + aggregateFunc + "(v0) )";
+                BenchmarkSession benchmarkSession = new BenchmarkSession("subset window lower left to lower right, " + aggregateFunc);
+                for (int i = 0; i < 8; i++) {
+                    int origin = i * 500;
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+                            subsetQuery, benchmarkContext.getArrayName0(), origin, 0, 3999 + origin, 3999)));
                 }
                 ret.add(benchmarkSession);
-
-                benchmarkSession = new BenchmarkSession(
-                        String.format("subset [i, %d], with i = [0, %d] and aggregate function: %s", arrayDimensionality, arrayDimensionality, aggregateFunc));
-                for (int i = 0; i <= upperBoundary; i++) {
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, aggregateFunc, i, upperBoundary)));
+                benchmarkSession = new BenchmarkSession("subset window lower left to upper right, " + aggregateFunc);
+                for (int i = 0; i < 8; i++) {
+                    int origin = i * 500;
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+                            subsetQuery, benchmarkContext.getArrayName0(), origin, origin, 3999 + origin, 3999 + origin)));
                 }
                 ret.add(benchmarkSession);
-
-            }
-//            System.out.println("Stop test aggregate min, max, add, avg operation");
-        }
-//*/
-        {
-//            System.out.println("Start test trigonometric operations");
-            String[][] unaryFuncs = {{"sqrt", "abs(c)"}, {"sin", "c"}, {"cos", "c"}, {"tan", "c"},
-//            {"arccos", "c"}, {"acos", "c"}, {"asin", "c"}
-            };
-            for (String[] unaryFunc : unaryFuncs) {
-                String func = unaryFunc[0];
-                BenchmarkSession benchmarkSession = new BenchmarkSession(func);
-                String query = "SELECT %s FROM %s AS c";
-                String expr = unaryFunc[1];
-                for (int i = 0; i < 5; i++) {
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
-                    expr = func + "(" + expr + ")";
+                benchmarkSession = new BenchmarkSession("subset window zoom in, " + aggregateFunc);
+                for (int i = 0; i < 8; i++) {
+                    int zoom = i * 500;
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+                            subsetQuery, benchmarkContext.getArrayName0(), zoom, zoom, 7999 - zoom, 7999 - zoom)));
+                }
+                ret.add(benchmarkSession);
+                benchmarkSession = new BenchmarkSession("subset window zoom out, " + aggregateFunc);
+                for (int i = 7; i >= 0; i--) {
+                    int zoom = i * 500;
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(
+                            subsetQuery, benchmarkContext.getArrayName0(), zoom, zoom, 7999 - zoom, 7999 - zoom)));
                 }
                 ret.add(benchmarkSession);
             }
-//            System.out.println("Stop test trigonometric operations");
         }
 
-        {
-//            System.out.println("Start test logical operations");
-            String[][] logicalFuncs = {{"Logical AND", "and"}, {"Logical OR", "or"}, {"Logical XOR", "xor"}}; //not
-            for (String[] logicalFunc : logicalFuncs) {
-                String func = logicalFunc[0];
-                BenchmarkSession benchmarkSession = new BenchmarkSession(func);
-                String expr = logicalFunc[1];
-                for (int i = 0; i <= upperBoundary; i++) {
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, expr, 0, i)));
-                }
-                ret.add(benchmarkSession);
-            }
-//            System.out.println("Stop test logical operations");
-        }
-
-        {
-//            System.out.println("Start test algebraic operations");
-            String[][] binaryFuncs = {{"multiplication", "*"}, {"division", "/"}, {"addition", "+"}, {"subtraction", "-"}};
-            for (String[] binaryFunc : binaryFuncs) {
-                BenchmarkSession benchmarkSession = new BenchmarkSession(binaryFunc[0]);
-                String query = "SELECT min_cells(%s) FROM %s AS c";
-                String expr = "c";
-                String op = binaryFunc[1];
-                for (int i = 0; i < 10; i++) {
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
-                    expr = expr + op + "c";
-                }
-                ret.add(benchmarkSession);
-            }
-//            System.out.println("Stop test algebraic operations");
-        }
-
-        {
-//            System.out.println("Start test comparison operation");
-            String[][] comparisonFuncs = {{"less than", "<"}, {"greater than", ">"}, {"less than or equal to", "<="},
-                    {"greater than or equal to", ">="}, {"equal to", "="}, {"not equal to", "!="}};
-            for (String[] comparisonFunc : comparisonFuncs) {
-                BenchmarkSession benchmarkSession = new BenchmarkSession(comparisonFunc[0]);
-                String query = "SELECT count_cells(%s) FROM %s AS c";
-                String expr = "";
-                String op = comparisonFunc[1];
-                for (int i = 0; i < 10; i++) {
-                    String currExpr = "(c" + op + i + ")";
-                    if (expr.isEmpty()) {
-                        expr = currExpr;
-                    } else {
-                        expr = expr + " and " + currExpr;
-                    }
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
-                }
-                ret.add(benchmarkSession);
-            }
-//            System.out.println("Stop test comparison operation");
-        }
+//        //TODO joins, nested queries, sorting.
+//
+//        //SELECT
+//        {
+////            System.out.println("Start test SELECT operation");
+//            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
+//            String query = "SELECT c FROM %s AS c, %s as d";
+//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+//            ret.add(benchmarkSession);
+////            System.out.println("Stop test SELECT operation");
+//        }
+//
+//        //CASTING
+//        {
+////            System.out.println("Start test SELECT operation");
+//            BenchmarkSession benchmarkSession = new BenchmarkSession("CASTING");
+//            String query = "SELECT (float)c FROM %s AS c";
+//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+//            ret.add(benchmarkSession);
+////            System.out.println("Stop test SELECT operation");
+//        }
+//
+//        {
+////            System.out.println("Start test aggregate min, max, add, avg operation");
+//            String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
+//            for (String aggregateFunc : aggregateFuncs) {
+////                long upperBoundary = domainBoundaries.get(0).getSecond();
+////                System.out.println(domainBoundaries.get(0));
+//
+//                BenchmarkSession benchmarkSession = new BenchmarkSession(
+//                        String.format("subset [0, i], with i = [0, %d] and aggregate function: %s", upperBoundary, aggregateFunc));
+//                for (int i = 0; i <= upperBoundary; i++) {
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, aggregateFunc, 0, i)));
+//                }
+//                ret.add(benchmarkSession);
+//
+//                benchmarkSession = new BenchmarkSession(
+//                        String.format("subset [i, %d], with i = [0, %d] and aggregate function: %s", arrayDimensionality, arrayDimensionality, aggregateFunc));
+//                for (int i = 0; i <= upperBoundary; i++) {
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, aggregateFunc, i, upperBoundary)));
+//                }
+//                ret.add(benchmarkSession);
+//
+//            }
+////            System.out.println("Stop test aggregate min, max, add, avg operation");
+//        }
+////*/
+//        {
+////            System.out.println("Start test trigonometric operations");
+//            String[][] unaryFuncs = {{"sqrt", "abs(c)"}, {"sin", "c"}, {"cos", "c"}, {"tan", "c"},
+////            {"arccos", "c"}, {"acos", "c"}, {"asin", "c"}
+//            };
+//            for (String[] unaryFunc : unaryFuncs) {
+//                String func = unaryFunc[0];
+//                BenchmarkSession benchmarkSession = new BenchmarkSession(func);
+//                String query = "SELECT %s FROM %s AS c";
+//                String expr = unaryFunc[1];
+//                for (int i = 0; i < 5; i++) {
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
+//                    expr = func + "(" + expr + ")";
+//                }
+//                ret.add(benchmarkSession);
+//            }
+////            System.out.println("Stop test trigonometric operations");
+//        }
+//
+//        {
+////            System.out.println("Start test logical operations");
+//            String[][] logicalFuncs = {{"Logical AND", "and"}, {"Logical OR", "or"}, {"Logical XOR", "xor"}}; //not
+//            for (String[] logicalFunc : logicalFuncs) {
+//                String func = logicalFunc[0];
+//                BenchmarkSession benchmarkSession = new BenchmarkSession(func);
+//                String expr = logicalFunc[1];
+//                for (int i = 0; i <= upperBoundary; i++) {
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(getQuery(arrayDimensionality, arrayName, expr, 0, i)));
+//                }
+//                ret.add(benchmarkSession);
+//            }
+////            System.out.println("Stop test logical operations");
+//        }
+//
+//        {
+////            System.out.println("Start test algebraic operations");
+//            String[][] binaryFuncs = {{"multiplication", "*"}, {"division", "/"}, {"addition", "+"}, {"subtraction", "-"}};
+//            for (String[] binaryFunc : binaryFuncs) {
+//                BenchmarkSession benchmarkSession = new BenchmarkSession(binaryFunc[0]);
+//                String query = "SELECT min_cells(%s) FROM %s AS c";
+//                String expr = "c";
+//                String op = binaryFunc[1];
+//                for (int i = 0; i < 10; i++) {
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
+//                    expr = expr + op + "c";
+//                }
+//                ret.add(benchmarkSession);
+//            }
+////            System.out.println("Stop test algebraic operations");
+//        }
+//
+//        {
+////            System.out.println("Start test comparison operation");
+//            String[][] comparisonFuncs = {{"less than", "<"}, {"greater than", ">"}, {"less than or equal to", "<="},
+//                    {"greater than or equal to", ">="}, {"equal to", "="}, {"not equal to", "!="}};
+//            for (String[] comparisonFunc : comparisonFuncs) {
+//                BenchmarkSession benchmarkSession = new BenchmarkSession(comparisonFunc[0]);
+//                String query = "SELECT count_cells(%s) FROM %s AS c";
+//                String expr = "";
+//                String op = comparisonFunc[1];
+//                for (int i = 0; i < 10; i++) {
+//                    String currExpr = "(c" + op + i + ")";
+//                    if (expr.isEmpty()) {
+//                        expr = currExpr;
+//                    } else {
+//                        expr = expr + " and " + currExpr;
+//                    }
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, expr, arrayName)));
+//                }
+//                ret.add(benchmarkSession);
+//            }
+////            System.out.println("Stop test comparison operation");
+//        }
 
         return ret;
     }
