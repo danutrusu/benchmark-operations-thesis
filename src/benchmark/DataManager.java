@@ -43,7 +43,7 @@ public abstract class DataManager<T> {
      * 
      * @return the time in ms
      */
-    public void generateData() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    public abstract void generateData() throws Exception;
+//        throw new UnsupportedOperationException("Not supported yet.");
+
 }
