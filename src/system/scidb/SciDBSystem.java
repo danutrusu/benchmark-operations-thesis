@@ -1,10 +1,12 @@
 package system.scidb;
 
-import benchmark.AdbmsSystem;
-import benchmark.DataManager;
-import benchmark.QueryExecutor;
-import benchmark.QueryGenerator;
-import benchmark.BenchmarkContext;
+import benchmark.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.DomainUtil;
+import util.IO;
+import util.ProcessExecutor;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,11 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import util.DomainUtil;
-import util.IO;
-import util.ProcessExecutor;
 
 /**
  *
@@ -75,6 +72,8 @@ public class SciDBSystem extends AdbmsSystem {
             return new SciDBCachingBenchmarkDataManager(this, queryExecutor, benchmarkContext);
         } else if (benchmarkContext.isStorageBenchmark()) {
             return new SciDBStorageBenchmarkDataManager(this, queryExecutor, benchmarkContext);
+        } else if (benchmarkContext.isOperationsBenchmark()) {
+            return new SciDBOperationsBenchmarkDataManager(this, queryExecutor, benchmarkContext);
         } else {
             throw new UnsupportedOperationException("Unsupported benchmark type '" + benchmarkContext.getBenchmarkType() + "'.");
         }

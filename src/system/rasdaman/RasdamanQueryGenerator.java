@@ -97,7 +97,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
         long upperBoundary = domainBoundaries.get(0).getSecond();
-/*
+
         //TODO joins, nested queries, sorting.
         //SELECT
         {
@@ -105,6 +105,16 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
             String query = "SELECT c FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+//            System.out.println("Stop test SELECT operation");
+        }
+
+        //JOINS
+        {
+//            System.out.println("Start test SELECT operation");
+            BenchmarkSession benchmarkSession = new BenchmarkSession("JOINS");
+            String query = "SELECT c FROM %s AS c, %s as d";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName, arrayName)));
             ret.add(benchmarkSession);
 //            System.out.println("Stop test SELECT operation");
         }
@@ -143,11 +153,11 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             }
 //            System.out.println("Stop test aggregate min, max, add, avg operation");
         }
-*/
+//*/
         {
 //            System.out.println("Start test trigonometric operations");
             String[][] unaryFuncs = {{"sqrt", "abs(c)"}, {"sin", "c"}, {"cos", "c"}, {"tan", "c"},
-//            {"acos", "c"}, {"acos", "c"}, {"asin", "c"}
+//            {"arccos", "c"}, {"acos", "c"}, {"asin", "c"}
                 };
             for (String[] unaryFunc : unaryFuncs) {
                 String func = unaryFunc[0];
@@ -165,7 +175,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
         {
 //            System.out.println("Start test logical operations");
-            String[][] logicalFuncs = {{"Logical AND", "and"}, {"Logical OR", "or"}, {"Logical XOR", "xor"}};
+            String[][] logicalFuncs = {{"Logical AND", "and"}, {"Logical OR", "or"}, {"Logical XOR", "xor"}}; //not
             for (String[] logicalFunc : logicalFuncs) {
                 String func = logicalFunc[0];
                 BenchmarkSession benchmarkSession = new BenchmarkSession(func);
