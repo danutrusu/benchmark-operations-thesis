@@ -19,10 +19,10 @@ public abstract class OperationsBenchmarkDataManager<T> extends DataManager<T> {
 
     private static final Logger log = LoggerFactory.getLogger(OperationsBenchmarkDataManager.class);
 
-    public static final int CELL_TYPE_SIZE = 8;
+    public static final int CELL_TYPE_SIZE = 1;
 
-    public static final int BAND_WIDTH = 11312;
-    public static final int BAND_HEIGHT = 11312;
+    public static final int BAND_WIDTH = 1024;//11312;
+    public static final int BAND_HEIGHT = 1024;//11312;
     public static final int ARRAY_SIZE = BAND_WIDTH * BAND_HEIGHT * CELL_TYPE_SIZE;
 
     public static final String ARRAY_SIZE_SHORT = "1GB";

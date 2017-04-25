@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkDataManager<SciDBSystem> {
 
-    private static final int TYPE_SIZE = 8;
-    private static final String TYPE_BASE = "double";
+    private static final int TYPE_SIZE = 1;
+    private static final String TYPE_BASE = "char";
 
     public SciDBOperationsBenchmarkDataManager(SciDBSystem systemController,
                                             QueryExecutor<SciDBSystem> queryExecutor, BenchmarkContext benchmarkContext) {
@@ -31,6 +31,8 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
             String arrayName = benchmarkContext.getArrayNameN(i);
 
             long tileUpperBound = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), benchmarkContext.getTileSize() / TYPE_SIZE);
+            System.out.println(tileUpperBound);
+
             String createArray = String.format("CREATE ARRAY %s <v%d:%s> [ d1=0:%d,%d,0, d2=0:%d,%d,0 ]",
                     arrayName, i, TYPE_BASE, BAND_WIDTH - 1, tileUpperBound, BAND_HEIGHT - 1, tileUpperBound);
             queryExecutor.executeTimedQuery(createArray);
