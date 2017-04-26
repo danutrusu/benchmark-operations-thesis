@@ -19,7 +19,7 @@ public abstract class OperationsBenchmarkDataManager<T> extends DataManager<T> {
 
     private static final Logger log = LoggerFactory.getLogger(OperationsBenchmarkDataManager.class);
 
-    public static final int CELL_TYPE_SIZE = 1;
+    public static final int CELL_TYPE_SIZE = 8;
 
     public static final int BAND_WIDTH = 1024;//11312;
     public static final int BAND_HEIGHT = 1024;//11312;
@@ -36,14 +36,26 @@ public abstract class OperationsBenchmarkDataManager<T> extends DataManager<T> {
     @Override
     public void generateData() throws Exception {
         if (benchmarkContext.isGenerateData()) {
-            for (int i = 0; i < ARRAY_NO; i++) {
-                String fileName = benchmarkContext.getArrayNameN(i);
-                RandomDataGenerator dataGen = new RandomDataGenerator(ARRAY_SIZE, benchmarkContext.getDataDir(), fileName);
-                String filePath = dataGen.getFilePath();
-                log.debug("Generated benchmark data slice: " + filePath);
-            }
+//            for (int i = 0; i < ARRAY_NO; i++) {
+            String fileName = benchmarkContext.getArrayName();
+            RandomDataGenerator dataGen = new RandomDataGenerator(ARRAY_SIZE, benchmarkContext.getDataDir(), fileName);
+            String filePath = dataGen.getFilePath();
+            log.debug("Generated benchmark data slice: " + filePath);
         }
+//        }
     }
+
+//    @Override
+//    public void generateData() throws Exception {
+//        if (benchmarkContext.isGenerateData()) {
+//            for (int i = 0; i < ARRAY_NO; i++) {
+//                String fileName = benchmarkContext.getArrayNameN(i);
+//                RandomDataGenerator dataGen = new RandomDataGenerator(ARRAY_SIZE, benchmarkContext.getDataDir(), fileName);
+//                String filePath = dataGen.getFilePath();
+//                log.debug("Generated benchmark data slice: " + filePath);
+//            }
+//        }
+//    }
 
     protected List<String> getSliceFilePaths(BenchmarkContext benchmarkContext) {
         List<String> ret = new ArrayList<>();
