@@ -23,7 +23,7 @@ public class SciDBQueryExecutor extends QueryExecutor<SciDBSystem> {
     @Override
     public long executeTimedQuery(String query, String... args) throws Exception {
         List<String> commandList = new ArrayList<>();
-        query = "'" + query + "'";
+//        query = "'" + query + "'";
         commandList.add(systemController.getQueryCommand());
         commandList.add("-q");
         commandList.add(query);
