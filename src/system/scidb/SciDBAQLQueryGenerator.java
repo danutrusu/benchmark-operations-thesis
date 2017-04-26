@@ -38,7 +38,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("JOINS");
             String query = "SELECT * FROM %s AS c, %s AS d";
-            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName, arrayName)));
             ret.add(benchmarkSession);
         }
 
