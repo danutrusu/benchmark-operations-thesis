@@ -1,12 +1,13 @@
 package system.scidb;
 
-import benchmark.QueryExecutor;
 import benchmark.BenchmarkContext;
+import benchmark.QueryExecutor;
+import util.ProcessExecutor;
+import util.StopWatch;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import util.ProcessExecutor;
-import util.StopWatch;
 
 /**
  * @author George Merticariu
@@ -22,10 +23,11 @@ public class SciDBQueryExecutor extends QueryExecutor<SciDBSystem> {
     @Override
     public long executeTimedQuery(String query, String... args) throws Exception {
         List<String> commandList = new ArrayList<>();
+        query = "'" + query + "'";
         commandList.add(systemController.getQueryCommand());
         commandList.add("-q");
         commandList.add(query);
-        commandList.add("-a");
+//        commandList.add("-a"); //only if AFL
         commandList.add("-p");
         commandList.add(String.valueOf(systemController.getPort()));
         Collections.addAll(commandList, args);
