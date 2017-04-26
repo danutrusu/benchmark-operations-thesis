@@ -40,8 +40,8 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
                 arrayName, TYPE_BASE, BAND_WIDTH - 1, tileUpperBound, BAND_HEIGHT - 1, tileUpperBound);
 
         queryExecutor.executeTimedQuery(createArray);
-        String insertDataQuery = MessageFormat.format("LOAD({0}, ''{1}'', 0, ''({2})'');",
-                arrayName, sliceFilePath, TYPE_BASE);
+//        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'', 0, ''({2})'');",
+        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}''", arrayName, sliceFilePath);
 
         totalTime += queryExecutor.executeTimedQuery(insertDataQuery);
         return totalTime;
