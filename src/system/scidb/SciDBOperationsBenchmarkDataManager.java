@@ -22,7 +22,8 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
     }
 
 
-    String createArrayQuery(String arrayName, int arrayDimensionality, long bound) {
+    String createArrayQuery(String arrayName, int arrayDimensionality) {
+        long bound = 500000;
         String createArray;
 
         switch(arrayDimensionality) {
@@ -52,7 +53,6 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
         String arrayName = benchmarkContext.getArrayName();
         int arrayDimensionality = benchmarkContext.getArrayDimensionality();
         long arraySize = benchmarkContext.getArraySize();
-        long bound = arraySize / arrayDimensionality;
 
         String sliceFilePath = IO.concatPaths(benchmarkContext.getDataDir(), arrayName);
 
@@ -65,7 +65,7 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
 
 //        String createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
 //                arrayName, TYPE_BASE, BAND_WIDTH - 1, tileUpperBound, BAND_HEIGHT - 1, tileUpperBound);
-        String createArray = createArrayQuery(arrayName, arrayDimensionality, bound);
+        String createArray = createArrayQuery(arrayName, arrayDimensionality);
 
         queryExecutor.executeTimedQuery(createArray);
 //        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'', 0, ''({2})'');",
