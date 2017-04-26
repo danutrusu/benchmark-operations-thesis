@@ -18,7 +18,7 @@ public class BenchmarkUtil {
 
     public static String getArrayName(int dimension, String size) {
         Date d = new Date();
-        return "colD" + dimension + "S" + size + "SCIDB";
+        return "colD" + dimension + "S" + size + d.getTime();
     }
 
     public static String getAsqldbCollectionNameInRasdaman(String tableName, String columnName) {
