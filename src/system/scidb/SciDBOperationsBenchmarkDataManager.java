@@ -21,26 +21,25 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
         super(systemController, queryExecutor, benchmarkContext);
     }
 
-
-    String createArrayQuery(String arrayName, int arrayDimensionality) {
-        long bound = 500000;
+    String createArrayQuery(String arrayName, int arrayDimensionality, long bound) {
+//        long bound = 500000;
         String createArray;
 
         switch(arrayDimensionality) {
             case 1: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, 0, bound);
+                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound);
                     break;
             case 2: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, 0, bound, 0, bound);
+                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
                     break;
             case 3: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, 0, bound, 0, bound, 0, bound);
+                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
                     break;
             case 4: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, 0, bound, 0, bound, 0, bound, 0, bound);
+                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
                     break;
             default:createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, 0, bound, 0, bound);
+                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
         }
 
         return createArray;
@@ -65,7 +64,7 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
 
 //        String createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
 //                arrayName, TYPE_BASE, BAND_WIDTH - 1, tileUpperBound, BAND_HEIGHT - 1, tileUpperBound);
-        String createArray = createArrayQuery(arrayName, arrayDimensionality);
+        String createArray = createArrayQuery(arrayName, arrayDimensionality, tileUpperBound);
 
         queryExecutor.executeTimedQuery(createArray);
 //        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'', 0, ''({2})'');",
