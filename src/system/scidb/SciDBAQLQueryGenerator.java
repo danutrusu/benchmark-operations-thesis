@@ -1,15 +1,11 @@
 package system.scidb;
 
-import benchmark.Benchmark;
-import benchmark.BenchmarkQuery;
-import benchmark.QueryGenerator;
-import benchmark.BenchmarkContext;
-import benchmark.BenchmarkSession;
+import benchmark.*;
+import data.DomainGenerator;
+import util.Pair;
 
 import java.text.MessageFormat;
 import java.util.List;
-
-import util.Pair;
 
 /**
  * @author George Merticariu
@@ -22,6 +18,50 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
     }
 
     @Override
+    public Benchmark getOperationsBenchmark() {
+        Benchmark ret = new Benchmark();
+        int arrayDimensionality = benchmarkContext.getArrayDimensionality();
+        String arrayName = benchmarkContext.getArrayName();
+        DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
+        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
+        long upperBoundary = domainBoundaries.get(0).getSecond();
+
+        System.out.println(arrayDimensionality + "  " + upperBoundary);
+
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
+            String query = "SELECT * FROM %s AS c";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+        }
+
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession("JOINS");
+            String query = "SELECT * FROM %s AS c, %s AS d";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+        }
+
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession("min");
+            String query = "SELECT min(v0) FROM %s AS c";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+        }
+
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession("casting to int");
+            String query = "SELECT int32(min(v0)) FROM %s AS c";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+        }
+
+
+
+        return ret;
+
+    }
+        @Override
     public Benchmark getStorageBenchmark() {
 
         Benchmark queries = new Benchmark();

@@ -58,7 +58,7 @@ public class SciDBSystem extends AdbmsSystem {
 
     @Override
     public QueryGenerator getQueryGenerator(BenchmarkContext benchmarkContext) {
-        return new SciDBAFLQueryGenerator(benchmarkContext);
+        return new SciDBAQLQueryGenerator(benchmarkContext);
     }
 
     @Override

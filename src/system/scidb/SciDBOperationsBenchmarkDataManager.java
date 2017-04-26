@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkDataManager<SciDBSystem> {
 
-    private static final int TYPE_SIZE = 1;
-    private static final String TYPE_BASE = "char";
+    private static final int TYPE_SIZE = 8;
+    private static final String TYPE_BASE = "double";
 
     public SciDBOperationsBenchmarkDataManager(SciDBSystem systemController,
                                             QueryExecutor<SciDBSystem> queryExecutor, BenchmarkContext benchmarkContext) {

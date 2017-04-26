@@ -79,6 +79,23 @@ public class SciDBAFLQueryGenerator extends QueryGenerator {
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
         long upperBoundary = domainBoundaries.get(0).getSecond();
 
+        //
+//        //SELECT
+//        {
+////            System.out.println("Start test SELECT operation");
+//            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
+//            String query = "SELECT c FROM %s AS c, %s as d";
+//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+//            ret.add(benchmarkSession);
+////            System.out.println("Stop test SELECT operation");
+//        }
+
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
+            String query = "SELECT c FROM %s AS c";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
+        }
 
         {
             String[] aggregateFuncs = {"min", "max", "sum", "avg"};
