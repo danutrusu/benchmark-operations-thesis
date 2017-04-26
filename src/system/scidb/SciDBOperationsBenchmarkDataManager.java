@@ -41,7 +41,7 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
 
         queryExecutor.executeTimedQuery(createArray);
 //        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'', 0, ''({2})'');",
-        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'' AS '(%s)'", arrayName, sliceFilePath, TYPE_BASE);
+        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'' AS ''{2}'';", arrayName, sliceFilePath, TYPE_BASE);
 
         totalTime += queryExecutor.executeTimedQuery(insertDataQuery);
         return totalTime;
