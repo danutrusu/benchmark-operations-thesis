@@ -22,11 +22,38 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
     }
 
 
+    String createArrayQuery(String arrayName, int arrayDimensionality, long bound) {
+        String createArray;
+
+        switch(arrayDimensionality) {
+            case 1: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0];",
+                    arrayName, TYPE_BASE, 0, bound);
+                    break;
+            case 2: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
+                    arrayName, TYPE_BASE, 0, bound, 0, bound);
+                    break;
+            case 3: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0];",
+                    arrayName, TYPE_BASE, 0, bound, 0, bound, 0, bound);
+                    break;
+            case 4: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
+                    arrayName, TYPE_BASE, 0, bound, 0, bound, 0, bound, 0, bound);
+                    break;
+            default:createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
+                    arrayName, TYPE_BASE, 0, bound, 0, bound);
+        }
+
+        return createArray;
+    }
+
     @Override
     public long loadData() throws Exception {
         long totalTime = 0;
 
         String arrayName = benchmarkContext.getArrayName();
+        int arrayDimensionality = benchmarkContext.getArrayDimensionality();
+        long arraySize = benchmarkContext.getArraySize();
+        long bound = arraySize / arrayDimensionality;
+
         String sliceFilePath = IO.concatPaths(benchmarkContext.getDataDir(), arrayName);
 
         if (!IO.fileExists(sliceFilePath)) {
@@ -36,12 +63,13 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
         long tileUpperBound = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), benchmarkContext.getTileSize() / TYPE_SIZE);
         System.out.println(tileUpperBound);
 
-        String createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
-                arrayName, TYPE_BASE, BAND_WIDTH - 1, tileUpperBound, BAND_HEIGHT - 1, tileUpperBound);
+//        String createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
+//                arrayName, TYPE_BASE, BAND_WIDTH - 1, tileUpperBound, BAND_HEIGHT - 1, tileUpperBound);
+        String createArray = createArrayQuery(arrayName, arrayDimensionality, bound);
 
         queryExecutor.executeTimedQuery(createArray);
 //        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'', 0, ''({2})'');",
-        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'' AS ''{2}'';", arrayName, sliceFilePath, TYPE_BASE);
+        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'' AS ''({2})'';", arrayName, sliceFilePath, TYPE_BASE);
 
         totalTime += queryExecutor.executeTimedQuery(insertDataQuery);
         return totalTime;

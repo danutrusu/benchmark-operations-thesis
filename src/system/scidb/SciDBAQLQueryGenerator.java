@@ -26,7 +26,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
         long upperBoundary = domainBoundaries.get(0).getSecond();
 
-        System.out.println(arrayDimensionality + "  " + upperBoundary);
+        System.out.println(arrayDimensionality + "  " + upperBoundary + " " + benchmarkContext.getArraySize());
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
