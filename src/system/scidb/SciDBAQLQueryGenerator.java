@@ -44,14 +44,14 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("min");
-            String query = "SELECT min(v0) FROM %s AS c";
+            String query = "SELECT min(v) FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("casting to int");
-            String query = "SELECT int32(min(v0)) FROM %s AS c";
+            String query = "SELECT int32(min(v)) FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
         }
