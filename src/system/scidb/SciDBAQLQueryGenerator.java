@@ -43,20 +43,56 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         }
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("min");
-            String query = "SELECT min(v) FROM %s AS c";
+            BenchmarkSession benchmarkSession = new BenchmarkSession("casting from double to float");
+            String query = "SELECT float(v) FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
+        }
+
+
+        {
+            String[] aggregateFuncs = {"min", "max", "sum", "avg", "prod", "count", "var"};
+            for (String aggregateFunc : aggregateFuncs) {
+
+                BenchmarkSession benchmarkSession = new BenchmarkSession(
+                        String.format("aggregate function: %s  on each dimension (out of %d)", aggregateFunc, arrayDimensionality));
+                for (int i = 0; i < arrayDimensionality; i++) {
+                    String query = String.format("SELECT %s(d%d) FROM %s", aggregateFunc, i + 1, arrayName);
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                }
+                ret.add(benchmarkSession);
+            }
         }
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("casting to int");
-            String query = "SELECT int32(min(v)) FROM %s AS c";
-            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-            ret.add(benchmarkSession);
+            String[] algebraicFuncs1 = {"sqrt(abs", "abs"};
+            for (String algebraicFunc : algebraicFuncs1) {
+
+                BenchmarkSession benchmarkSession = new BenchmarkSession(
+                        String.format("algebraic function: %s  on each dimension (out of %d)", algebraicFunc, arrayDimensionality));
+                for (int i = 0; i < arrayDimensionality; i++) {
+                    String query = String.format("SELECT %s(d%d) FROM %s", algebraicFunc, i + 1, arrayName);
+                    if (algebraicFunc.equals("sqrt(abs"))
+                        query = String.format("SELECT %s(d%d)) FROM %s", algebraicFunc, i + 1, arrayName);
+
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                }
+                ret.add(benchmarkSession);
+            }
+
+            String[] algebraicFuncs2 = {"+", "-", "*", "/", "%"};
+            for (String algebraicFunc : algebraicFuncs2) {
+
+                BenchmarkSession benchmarkSession = new BenchmarkSession(
+                        String.format("algebraic function 2 : %s  on each dimension (out of %d)", algebraicFunc, arrayDimensionality));
+                for (int i = 0; i < arrayDimensionality; i++) {
+                    String query = String.format("SELECT d%d %s d%d FROM %s", i + 1, algebraicFunc, i + 1, arrayName);
+
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                }
+                ret.add(benchmarkSession);
+            }
         }
-
-
 
         return ret;
 
