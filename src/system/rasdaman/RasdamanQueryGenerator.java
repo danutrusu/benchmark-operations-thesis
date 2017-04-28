@@ -207,8 +207,8 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
         {
 //            System.out.println("Start test comparison operation");
-            String[][] comparisonFuncs = {{"less than", "<"}, {"greater than", ">"}, {"less than or equal to", "<="},
-                    {"greater than or equal to", ">="}, {"equal to", "="}, {"not equal to", "!="}};
+            String[][] comparisonFuncs = {{"less than", "<"}, {"less than or equal to", "<="}, {"not equal to", "!="},
+                    {"equal to", "="}, {"greater than", ">"}, {"greater than or equal to", ">="}};
             for (String[] comparisonFunc : comparisonFuncs) {
                 BenchmarkSession benchmarkSession = new BenchmarkSession(comparisonFunc[0]);
                 String query = "SELECT count_cells(%s) FROM %s AS c";
