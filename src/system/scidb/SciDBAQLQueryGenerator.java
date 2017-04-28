@@ -62,8 +62,8 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
                     String query = String.format("SELECT %s(d%d) FROM %s", aggregateFunc, i + 1, arrayName);
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
-                ret.add(benchmarkSession);
             }
+            ret.add(benchmarkSession);
         }
 
         {
@@ -82,8 +82,8 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
-                ret.add(benchmarkSession);
             }
+            ret.add(benchmarkSession);
 
             benchmarkSession = new BenchmarkSession(
                     String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) ON EACH DIMENSION (out of %d)"
@@ -96,8 +96,8 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
-                ret.add(benchmarkSession);
             }
+            ret.add(benchmarkSession);
         }
 
         {
@@ -116,8 +116,8 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
-                ret.add(benchmarkSession);
             }
+            ret.add(benchmarkSession);
         }
 
         {
@@ -133,8 +133,8 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
                     String query = String.format("SELECT d%d %s %d FROM %s", i + 1, comparisonFunc, comparisonNumber, arrayName);
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
-                ret.add(benchmarkSession);
             }
+            ret.add(benchmarkSession);
         }
 
         {
@@ -150,8 +150,8 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
                     String query = String.format("SELECT %s(d%d) FROM %s", trigonometricFunc, i + 1, arrayName);
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
-                ret.add(benchmarkSession);
             }
+            ret.add(benchmarkSession);
         }
 
         return ret;
