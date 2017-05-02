@@ -110,7 +110,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
                     String.format("LOGICAL OPERATORS ON EACH DIMENSION (out of %d)"
-                            , arrayDimensionality));
+                            ,arrayDimensionality));
 //            String[] logicalFuncs = {"and", "or", "not"}; //TODO look for xor, currently error.
             for (String logicalFunc : logicalFuncs) {
 

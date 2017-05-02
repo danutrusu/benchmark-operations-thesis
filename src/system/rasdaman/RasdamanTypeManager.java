@@ -8,6 +8,7 @@ package system.rasdaman;
 import util.Pair;
 
 import java.text.MessageFormat;
+import java.util.Date;
 
 /**
  * Create/drop types in rasdaman.
@@ -106,7 +107,8 @@ public class RasdamanTypeManager {
 //        return baseTypeName;
 //    }
     public String getOperationsMddTypeName(int noOfDimensions, String baseTypeName) {
-        String mddTypeName = MessageFormat.format("B_MDD_{0}_{1}_{2}", baseTypeName, noOfDimensions, MDD_TYPE++);
+        Date d = new Date();
+        String mddTypeName = String.format("B_MDD_%s_%d_%d", baseTypeName, noOfDimensions, d.getTime());
         return mddTypeName;
     }
 
@@ -118,8 +120,9 @@ public class RasdamanTypeManager {
     }
 
     public String getOperationsSetTypeName(int noOfDimensions, String baseTypeName) {
-        String setTypeName = MessageFormat.format("B_SET_{0}_{1}_{2}", baseTypeName, noOfDimensions, SET_TYPE++);
-        SET_TYPE++;
+        Date d = new Date();
+        String setTypeName = String.format("B_SET_%s_%d_%s", baseTypeName, noOfDimensions, d.getTime());
+//        SET_TYPE++;
         return setTypeName;
     }
 

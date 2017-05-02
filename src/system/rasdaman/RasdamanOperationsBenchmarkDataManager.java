@@ -84,7 +84,8 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
 
         long chunkSize = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), ((OperationsBenchmarkContext)benchmarkContext).getTileSize());
         long tileSize = (long) Math.pow(chunkSize + 1l, benchmarkContext.getArrayDimensionality());
-        tileSize = fileSize * 8;
+//        fileSize *= 8;
+        tileSize = fileSize;
 
         dataGenerator = new RandomDataGenerator(fileSize, benchmarkContext.getDataDir());
         String filePath = dataGenerator.getFilePath();
@@ -94,7 +95,6 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
             tileStructureDomain.add(Pair.of(0l, chunkSize));
         }
 
-//        typeManager.deleteTypes(typeManager.getBaseTypeName("char"));
         Pair<String, String> aChar = typeManager.createOperationsType(benchmarkContext.getArrayDimensionality(), "char");
 
         String createCollectionQuery = String.format("CREATE COLLECTION %s %s", benchmarkContext.getArrayName(), aChar.getSecond());
