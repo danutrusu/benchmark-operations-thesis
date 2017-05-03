@@ -109,9 +109,9 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 //                BenchmarkSession benchmarkSession = new BenchmarkSession(
 //                        String.format("logical operator : %s  on each dimension (out of %d)", logicalFunc, arrayDimensionality));
 //                for (int i = 0; i < arrayDimensionality; i++) {
-                    String query = String.format("SELECT v %s v FROM %s", logicalFunc, arrayName);
+                    String query = String.format("SELECT v > 0 %s v < 500 FROM %s", logicalFunc, arrayName);
                     if (logicalFunc.equals("not"))
-                        query = String.format("SELECT %s(v) FROM %s", logicalFunc, arrayName);
+                        query = String.format("SELECT %s(v < 500) FROM %s", logicalFunc, arrayName);
 
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
 //                }

@@ -258,9 +258,9 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             for (String logicalFunc : logicalFuncs) {
 //                for (int i = 0; i < arrayDimensionality; i++) {
 //                    String interval = getInterval(arrayDimensionality, i, upperBoundary);
-                    String query = String.format("SELECT c %s c FROM %s AS c", logicalFunc, arrayName, arrayName);
+                    String query = String.format("SELECT c > 0 %s c < 500 FROM %s AS c", logicalFunc, arrayName, arrayName);
                     if (logicalFunc.equals("not"))
-                        query = String.format("SELECT %s(c) FROM %s AS c", logicalFunc, arrayName, arrayName);
+                        query = String.format("SELECT %s(c < 500) FROM %s AS c", logicalFunc, arrayName, arrayName);
 
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
 //                }
