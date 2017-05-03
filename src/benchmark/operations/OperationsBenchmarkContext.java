@@ -13,6 +13,7 @@ public class OperationsBenchmarkContext extends BenchmarkContext {
     protected final int queryNumber;
 
     protected long dataSize;
+    protected String dataType;
 
     public OperationsBenchmarkContext(double maxSelectSizePercent, long tileSize, int queryNumber, int repeatNumber, String dataDir, int timeout) {
         super(repeatNumber, dataDir, timeout, TYPE_OPERATIONS);
@@ -35,6 +36,14 @@ public class OperationsBenchmarkContext extends BenchmarkContext {
 //    }
 
 
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
 
     public long getDataSize() {
             return dataSize;

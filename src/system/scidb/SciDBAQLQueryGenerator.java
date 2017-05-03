@@ -1,7 +1,6 @@
 package system.scidb;
 
 import benchmark.*;
-import data.DomainGenerator;
 import util.Pair;
 
 import java.text.MessageFormat;
@@ -22,30 +21,30 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
     @Override
     public Benchmark getOperationsBenchmark() {
         String[] algebraicFuncs1 = {"sqrt(abs", "abs"};
-        String[] algebraicFuncs2 = {"+", "-", "*", "/", "%"};
+        String[] algebraicFuncs2 = {"+", "-", "*", "/"};
         String[] comparisonFuncs = {"<", "<=", "<>", "=", ">", ">="};
         String[] trigonometricFuncs = {"sin", "cos", "tan", "asin", "acos", "atan", "exp", "log"};
-        String[] logicalFuncs = {"and", "or", "not"}; //TODO look for xor, currently error.
-        String[] aggregateFuncs = {"min", "max", "sum", "avg", "prod", "count", "var"};
+        String[] logicalFuncs = {"and", "or", "not"};
+        String[] aggregateFuncs = {"min", "max", "sum", "avg"};
 
         Benchmark ret = new Benchmark();
         int arrayDimensionality = benchmarkContext.getArrayDimensionality();
         String arrayName = benchmarkContext.getArrayName();
-        DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
-        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
-        long upperBoundary = domainBoundaries.get(0).getSecond();
+//        DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
+//        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
+//        long upperBoundary = domainBoundaries.get(0).getSecond();
 
-        System.out.println(arrayDimensionality + "  " + upperBoundary + " " + benchmarkContext.getArraySize());
+//        System.out.println(arrayDimensionality + "  " + upperBoundary + " " + benchmarkContext.getArraySize());
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
+            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT (%dD)");
             String query = "SELECT * FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
         }
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("casting from double to float");
+            BenchmarkSession benchmarkSession = new BenchmarkSession("CASTING (%dD)");
             String query = "SELECT float(v) FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
@@ -53,102 +52,87 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("AGGREGATE FUNCTIONS (min, max, sum, avg, prod, count, var ) ON EACH DIMENSION (out of %d)"
+                    String.format("AGGREGATE FUNCTIONS (min, max, sum, avg ) (%dD)"
                             , arrayDimensionality));
-//            String[] aggregateFuncs = {"min", "max", "sum", "avg", "prod", "count", "var"};
 
             for (String aggregateFunc : aggregateFuncs) {
-//                for (int i = 0; i < arrayDimensionality; i++) {
                     String query = String.format("SELECT %s(v) FROM %s", aggregateFunc, arrayName);
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs) ON EACH DIMENSION (out of %d)"
+                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs) (%dD)"
                             , arrayDimensionality));
-//            String[] algebraicFuncs1 = {"sqrt(abs", "abs"};
             for (String algebraicFunc : algebraicFuncs1) {
 
-//                BenchmarkSession benchmarkSession = new BenchmarkSession(
-//                        String.format("algebraic function: %s  on each dimension (out of %d)", algebraicFunc, arrayDimensionality));
-//                for (int i = 0; i < arrayDimensionality; i++) {
-                    String query = String.format("SELECT %s(v) FROM %s", algebraicFunc, arrayName);
-                    if (algebraicFunc.equals("sqrt(abs"))
-                        query = String.format("SELECT %s(v)) FROM %s", algebraicFunc, arrayName);
+                String query = String.format("SELECT %s(v) FROM %s", algebraicFunc, arrayName);
+                if (algebraicFunc.equals("sqrt(abs"))
+                    query = String.format("SELECT %s(v)) FROM %s", algebraicFunc, arrayName);
 
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
 
             benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) ON EACH DIMENSION (out of %d)"
-                            , arrayDimensionality));
+                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)", arrayDimensionality));
 
-//            String[] algebraicFuncs2 = {"+", "-", "*", "/", "%"};
             for (String algebraicFunc : algebraicFuncs2) {
-//                for (int i = 0; i < arrayDimensionality; i++) {
                     String query = String.format("SELECT v %s v FROM %s WHERE v <> 0", algebraicFunc, arrayName);
 
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("LOGICAL OPERATORS %dD",arrayDimensionality));
-//            String[] logicalFuncs = {"and", "or", "not"}; //TODO look for xor, currently error.
+                    String.format("LOGICAL OPERATORS (%dD)",arrayDimensionality));
             for (String logicalFunc : logicalFuncs) {
 
-//                BenchmarkSession benchmarkSession = new BenchmarkSession(
-//                        String.format("logical operator : %s  on each dimension (out of %d)", logicalFunc, arrayDimensionality));
-//                for (int i = 0; i < arrayDimensionality; i++) {
-                    String query = String.format("SELECT v > 0 %s v < 500 FROM %s", logicalFunc, arrayName);
-                    if (logicalFunc.equals("not"))
-                        query = String.format("SELECT %s(v < 500) FROM %s", logicalFunc, arrayName);
+                String query = String.format("SELECT v > 0 %s v < 500 FROM %s", logicalFunc, arrayName);
+                if (logicalFunc.equals("not"))
+                    query = String.format("SELECT %s(v < 500) FROM %s", logicalFunc, arrayName);
 
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("COMPARISON OPERATORS ON EACH DIMENSION (out of %d)"
-                            , arrayDimensionality));
-//            String[] comparisonFuncs = {"<", "<=", "<>", "=", ">", ">="};
+                    String.format("COMPARISON OPERATORS (%dD)", arrayDimensionality));
             for (String comparisonFunc : comparisonFuncs) {
-//
-//                BenchmarkSession benchmarkSession = new BenchmarkSession(
-//                        String.format("comparison function: %s  on each dimension (out of %d)", comparisonFunc, arrayDimensionality));
-//                for (int i = 0; i < arrayDimensionality; i++) {
-                    String query = String.format("SELECT v %s %d FROM %s", comparisonFunc, comparisonNumber, arrayName);
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+                String query = String.format("SELECT v %s %d FROM %s", comparisonFunc, comparisonNumber, arrayName);
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("TRIGONOMETRIC OPERATORS ON EACH DIMENSION (out of %d)"
-                            , arrayDimensionality));
-//            String[] trigonometricFuncs = {"sin", "cos", "tan", "asin", "acos", "atan", "exp", "log"};
+                    String.format("TRIGONOMETRIC OPERATORS (%dD)", arrayDimensionality));
             for (String trigonometricFunc : trigonometricFuncs) {
+                String query = String.format("SELECT %s(v) FROM %s", trigonometricFunc, arrayName);
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+            }
+            ret.add(benchmarkSession);
+        }
 
-//                BenchmarkSession benchmarkSession = new BenchmarkSession(
-//                        String.format("trigonometric function: %s  on each dimension (out of %d)", trigonometricFunc, arrayDimensionality));
-//                for (int i = 0; i < arrayDimensionality; i++) {
-                    String query = String.format("SELECT %s(v) FROM %s", trigonometricFunc, arrayName);
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession(
+                    String.format("STACK ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) FOR CACHING (%dD)", arrayDimensionality));
+
+            for (String algebraicFunc : algebraicFuncs2) {
+                String expr = "v";
+                for (int i = 0; i < 10; i++) {
+                    String query = String.format("SELECT %s FROM %s", expr, arrayName);
+                    expr += algebraicFunc + "v";
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+
+                }
             }
             ret.add(benchmarkSession);
         }

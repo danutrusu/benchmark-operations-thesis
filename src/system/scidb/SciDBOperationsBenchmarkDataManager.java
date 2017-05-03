@@ -2,6 +2,7 @@ package system.scidb;
 
 import benchmark.BenchmarkContext;
 import benchmark.QueryExecutor;
+import benchmark.operations.OperationsBenchmarkContext;
 import benchmark.operations.OperationsBenchmarkDataManager;
 import util.DomainUtil;
 import util.IO;
@@ -21,26 +22,42 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
         super(systemController, queryExecutor, benchmarkContext);
     }
 
-    String createArrayQuery(String arrayName, int arrayDimensionality, long bound) {
+    String createArrayQuery(String arrayName, int arrayDimensionality, long bound, String dataType) {
 //        long bound = 500000;
         String createArray;
 
-        switch(arrayDimensionality) {
-            case 1: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound);
-                    break;
-            case 2: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
-                    break;
-            case 3: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
-                    break;
-            case 4: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
-                    break;
-            default:createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
-                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
+        String dimensions = "";
+        for (int i = 0; i < arrayDimensionality; ++i) {
+            if (i == 0) {
+                dimensions += String.format("d%d=0:%d,%d,0", i + 1, BAND_WIDTH - 1, bound);
+            } else {
+                dimensions += ", " + String.format("d%d=0:%d,%d,0", i + 1, BAND_WIDTH - 1, bound);
+            }
         }
+
+        createArray = String.format("CREATE ARRAY %s<v:%s>[%s];", arrayName, dataType, dimensions);
+//        switch(arrayDimensionality) {
+//            case 1: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0];",
+//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound);
+//                    break;
+//            case 2: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
+//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
+//                    break;
+//            case 3: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0];",
+//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
+//                    break;
+//            case 4: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
+//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
+//                    break;
+//            case 5: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
+//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
+//                break;
+//            case 6: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
+//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
+//                break;
+//            default:createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
+//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
+//        }
 
         return createArray;
     }
@@ -52,6 +69,7 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
         String arrayName = benchmarkContext.getArrayName();
         int arrayDimensionality = benchmarkContext.getArrayDimensionality();
         long arraySize = benchmarkContext.getArraySize();
+        String dataType = ((OperationsBenchmarkContext)benchmarkContext).getDataType();
 
         String sliceFilePath = IO.concatPaths(benchmarkContext.getDataDir(), arrayName);
 
@@ -59,16 +77,16 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
             return 0;
         }
 
-        long tileUpperBound = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), benchmarkContext.getTileSize() / TYPE_SIZE);
+        long tileUpperBound = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), benchmarkContext.getTileSize() / domainGenerator.getBytes(dataType));
         System.out.println(tileUpperBound);
 
 //        String createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
 //                arrayName, TYPE_BASE, BAND_WIDTH - 1, tileUpperBound, BAND_HEIGHT - 1, tileUpperBound);
-        String createArray = createArrayQuery(arrayName, arrayDimensionality, tileUpperBound);
+        String createArray = createArrayQuery(arrayName, arrayDimensionality, tileUpperBound, dataType);
 
         queryExecutor.executeTimedQuery(createArray);
 //        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'', 0, ''({2})'');",
-        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'' AS ''({2})'';", arrayName, sliceFilePath, TYPE_BASE);
+        String insertDataQuery = MessageFormat.format("LOAD {0} FROM ''{1}'' AS ''({2})'';", arrayName, sliceFilePath, dataType );
 
         totalTime += queryExecutor.executeTimedQuery(insertDataQuery);
         return totalTime;

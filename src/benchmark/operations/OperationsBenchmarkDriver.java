@@ -44,6 +44,8 @@ public class OperationsBenchmarkDriver extends Driver {
                                 't', "tile-size", "Tile size, same format as for the --sizes option."),
                         new FlaggedOption("datadir", JSAP.STRING_PARSER, "/tmp", JSAP.REQUIRED, JSAP.NO_SHORTFLAG,
                                 "datadir", "Data directory, for temporary and permanent data used in ingestion."),
+                        new FlaggedOption("datatype", JSAP.STRING_PARSER, "char", JSAP.REQUIRED, JSAP.NO_SHORTFLAG,
+                                "datatype", "Data type, set it with --datatype (char, float, double, long(rasdaman), int32(scidb), unsigned long(rasdaman), uint32(scidb)"),
                         new Switch("load", JSAP.NO_SHORTFLAG,
                                 "load", "Load data."),
                         new Switch("drop", JSAP.NO_SHORTFLAG,
@@ -66,6 +68,7 @@ public class OperationsBenchmarkDriver extends Driver {
         int exitCode = 0;
 
         double maxSelectSize = config.getDouble("max_select_size");
+        String dataType = config.getString("datatype");
         Pair<Long, String> tileSize = DomainUtil.parseSize(config.getString("tilesize"));
         int queries = config.getInt("queries");
         int repeat = config.getInt("repeat");
@@ -79,6 +82,7 @@ public class OperationsBenchmarkDriver extends Driver {
         benchmarkContext.setGenerateData(config.getBoolean("generate"));
         benchmarkContext.setDisableBenchmark(config.getBoolean("nobenchmark"));
         benchmarkContext.setDisableSystemRestart(config.getBoolean("norestart"));
+        benchmarkContext.setDataType(dataType);
 
         String[] systems = config.getStringArray("system");
         String[] configs = config.getStringArray("config");
@@ -86,28 +90,7 @@ public class OperationsBenchmarkDriver extends Driver {
             throw new IllegalArgumentException(systems.length + " systems specified, but " + configs.length + " system configuration files.");
         }
 
-//        long[] dataSizes = config.getLongArray("cacheSizes");
-//        if (config.contains("tilesize")) {
-//            long tileSize = config.getLong("tilesize");
-//            benchmarkContext.setTileSize(tileSize);
-//        }
-
         int configInd = 0;
-//        for (String system : systems) {
-//            String configFile = configs[configInd++];
-//            AdbmsSystem adbmsSystem = AdbmsSystem.getAdbmsSystem(system, configFile, benchmarkContext);
-//            if (benchmarkContext.isDisableBenchmark()) {
-//                exitCode += runBenchmark(benchmarkContext, adbmsSystem);
-//            } else {
-//                ////TODO: modify for operations with different sizes.
-//                for (long dataSize : dataSizes) {
-//                    benchmarkContext.setDataSize(dataSize);
-//                    adbmsSystem.setSystemCacheSize(dataSize);
-//                    log.info("Data size set to " + dataSize + " bytes in " + adbmsSystem.getSystemName() + ".");
-//                    exitCode += runBenchmark(benchmarkContext, adbmsSystem);
-//                }
-//            }
-//        }
 
         String[] arraySizes = config.getStringArray("size");
         Pair<Long, String>[] sizes = DomainUtil.parseSizes(arraySizes);
@@ -140,6 +123,6 @@ public class OperationsBenchmarkDriver extends Driver {
 
     @Override
     protected String getDescription() {
-        return "Benchmark operations behaviour in Array Databases. Currently supported systems: rasdaman.";
+        return "Benchmark operations behaviour in Array Databases. Currently supported systems: rasdaman, scidb";
     }
 }

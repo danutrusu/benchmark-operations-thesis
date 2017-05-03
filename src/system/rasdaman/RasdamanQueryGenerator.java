@@ -2,6 +2,7 @@ package system.rasdaman;
 
 
 import benchmark.*;
+import benchmark.operations.OperationsBenchmarkContext;
 import data.DomainGenerator;
 import util.Pair;
 
@@ -19,76 +20,6 @@ public class RasdamanQueryGenerator extends QueryGenerator {
     public RasdamanQueryGenerator(BenchmarkContext benchmarkContext) {
         super(benchmarkContext);
     }
-
-//    private String getQuery(int dimension, String arrayName, String function, int start, long stop) {
-//        String subsetQuery;
-//        List<String> logicalFunctions = new ArrayList<>(Arrays.asList("and", "or", "xor", "not"));
-//        List<String> aggregateFunctions = new ArrayList<>(Arrays.asList("min_cells", "max_cells", "add_cells", "avg_cells"));
-//
-//        if (aggregateFunctions.contains(function)) {
-//            switch (dimension) {
-//                case 1:
-//                    subsetQuery = "SELECT " + function + "(c[%d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, arrayName);
-//                case 2:
-//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
-//                case 3:
-//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, start, stop, arrayName);
-//                case 4:
-//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, arrayName);
-////                case 5:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-////                    break;
-////                case 6:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-////                    break;
-////                case 7:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-////                    break;
-////                case 8:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-//                default:
-//                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
-//            }
-//        }
-////        else if (logicalFunctions.contains(function)) {
-//        else {
-//            switch (dimension) {
-//                case 1:
-//                    subsetQuery = "SELECT (c[%d:%d]) " + function + "(c[%d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
-//                case 2:
-//                    subsetQuery = "SELECT (c[%d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, arrayName);
-//                case 3:
-//                    subsetQuery = "SELECT (c[%d:%d, %d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d, %d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop, start, stop, start, stop, arrayName);
-//                case 4:
-//                    subsetQuery = "SELECT ((c[%d:%d, %d:%d, %d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d, %d:%d, %d:%d])) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, start, stop, start, stop,
-//                            start, stop, start, stop, start, stop, start, stop, arrayName);
-////                case 5:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-////                    break;
-////                case 6:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-////                    break;
-////                case 7:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-////                    break;
-////                case 8:
-////                    subsetQuery = "SELECT " + function + "(c[%d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d, %d:%d]) FROM %s as c";
-////                    break;
-//                default:
-//                    subsetQuery = "SELECT (c[%d:%d, %d:%d]) " + function + " (c[%d:%d, %d:%d]) FROM %s as c";
-//                    return String.format(subsetQuery, start, stop, start, stop, arrayName);
-//            }
-//        }
-//    }
 
     String getMArrayQuery(int arrayDimensionality, int dimension, long boundary, String arrayName, String operation) {
         String query;
@@ -121,85 +52,71 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         return query;
     }
 
-    String getInterval(int arrayDimensionality, int dimension, long boundary) {
-        String interval = "";
-        for (int i = 0; i < arrayDimensionality; ++i) {
-            if (i == dimension) {
-                if (i == 0)
-                    interval += "0:" + boundary;
-                else
-                    interval += ",0:" + boundary;
-            } else {
-                if (i == 0)
-                    interval += "0";
-                else
-                    interval += ",0";
-            }
-        }
-
-        return interval;
-    }
-
-    String getInterval2D(int arrayDimensionality, int dim1, int dim2, long boundary) {
-        String interval = "";
-        for (int i = 0; i < arrayDimensionality; ++i) {
-            if (i == dim1 || i == dim2) {
-                if (i == 0)
-                    interval += "0:" + boundary;
-                else
-                    interval += ",0:" + boundary;
-            } else {
-                if (i == 0)
-                    interval += "0";
-                else
-                    interval += ",0";
-            }
-        }
-
-        return interval;
-    }
+//    String getInterval(int arrayDimensionality, int dimension, long boundary) {
+//        String interval = "";
+//        for (int i = 0; i < arrayDimensionality; ++i) {
+//            if (i == dimension) {
+//                if (i == 0)
+//                    interval += "0:" + boundary;
+//                else
+//                    interval += ",0:" + boundary;
+//            } else {
+//                if (i == 0)
+//                    interval += "0";
+//                else
+//                    interval += ",0";
+//            }
+//        }
+//
+//        return interval;
+//    }
+//
+//    String getInterval2D(int arrayDimensionality, int dim1, int dim2, long boundary) {
+//        String interval = "";
+//        for (int i = 0; i < arrayDimensionality; ++i) {
+//            if (i == dim1 || i == dim2) {
+//                if (i == 0)
+//                    interval += "0:" + boundary;
+//                else
+//                    interval += ",0:" + boundary;
+//            } else {
+//                if (i == 0)
+//                    interval += "0";
+//                else
+//                    interval += ",0";
+//            }
+//        }
+//
+//        return interval;
+//    }
 
     @Override
     public Benchmark getOperationsBenchmark() {
         String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
         String[] algebraicFuncs1 = {"sqrt(abs", "abs"};
         String[] algebraicFuncs2 = {"+", "-", "*", "/"}; //TODO look for "%"
-        String[] logicalFuncs = {"and", "or", "not", "xor"}; //TODO look for xor, currently error.
+        String[] logicalFuncs = {"and", "or", "not"}; //TODO look for xor, currently error.
         String[] comparisonFuncs = {"<", "<=", "<>", "=", ">", ">="};
-        String[] trigonometricFuncs = {"sin", "cos", "tan", /*"arcsin", "arccos",*/ "arctan", "exp" /*"log*/}; //TODO error with arcsin and log
+        String[] trigonometricFuncs = {"sin", "cos", "tan", /*"arcsin", "arccos",*/ "arctan", "exp", "log"}; //TODO error with arcsin and log
 
         Benchmark ret = new Benchmark();
         int arrayDimensionality = benchmarkContext.getArrayDimensionality();
         String arrayName = benchmarkContext.getArrayName();
         DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
-        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
+        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize(), ((OperationsBenchmarkContext) benchmarkContext).getDataType());
         long upperBoundary = domainBoundaries.get(0).getSecond();
 
         System.out.println(arrayDimensionality + " " + upperBoundary);
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT");
+            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT (%dD)");
             String query = "SELECT c FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
         }
 
-//        {
-//            BenchmarkSession benchmarkSession = new BenchmarkSession("test");
-//            String query = "SELECT marray x in [0:0] values min_cells(c[x[0],*:*,*:*,*:*,*:*]) FROM %s AS c";
-//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-//            ret.add(benchmarkSession);
-//        }
-
-//        {
-//            BenchmarkSession benchmarkSession = new BenchmarkSession("JOINS");
-//            String query = "SELECT c FROM %s AS c, %s as d";
-//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName, arrayName)));
-//            ret.add(benchmarkSession);
-//        }
-
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("CASTING");
+            BenchmarkSession benchmarkSession = new BenchmarkSession("CASTING (%dD)");
             String query = "SELECT (float)c FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
@@ -207,98 +124,92 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("AGGREGATE FUNCTIONS (min, max, sum, avg) ON EACH DIMENSION (out of %d)"
+                    String.format("AGGREGATE FUNCTIONS (min, max, sum, avg) (%dD)"
                             , arrayDimensionality));
-//            String interval = getInterval(arrayDimensionality, 0, upperBoundary);
             for (String aggregateFunc : aggregateFuncs) {
-//                String query = String.format("SELECT marray x in [0:%d] values %s(c[%s]) from %s AS c", upperBoundary, aggregateFunc, interval, arrayName);
                 String query = getMArrayQuery(arrayDimensionality, 0, upperBoundary, arrayName, aggregateFunc);
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
         }
 
-
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs) ON EACH DIMENSION (out of %d)"
-                            , arrayDimensionality));
+                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs) (%dD)", arrayDimensionality));
             for (String algebraicFunc : algebraicFuncs1) {
-//                for (int i = 0; i < arrayDimensionality; i++) {
-                    String query;
-//                    String interval = getInterval(arrayDimensionality, i, upperBoundary);
-                    if (!algebraicFunc.equals("sqrt(abs"))
-                        query = String.format("SELECT %s(c) FROM %s AS c", algebraicFunc, arrayName);
-                    else
-                        query = String.format("SELECT %s(c)) FROM %s AS c", algebraicFunc, arrayName);
+                String query;
+                if (!algebraicFunc.equals("sqrt(abs"))
+                    query = String.format("SELECT %s(c) FROM %s AS c", algebraicFunc, arrayName);
+                else
+                    query = String.format("SELECT %s(c)) FROM %s AS c", algebraicFunc, arrayName);
 
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
 
             benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) ON EACH DIMENSION (out of %d)"
+                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)"
                             , arrayDimensionality));
 
             for (String algebraicFunc : algebraicFuncs2) {
-//                for (int i = 0; i < arrayDimensionality; i++) {
-//                    String interval = getInterval(arrayDimensionality, i, upperBoundary);
                     String query = String.format("SELECT c %s c FROM %s AS c", algebraicFunc, arrayName);
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("LOGICAL OPERATORS ON EACH DIMENSION (out of %d)", arrayDimensionality));
+                    String.format("LOGICAL OPERATORS (%dD)", arrayDimensionality));
 
             for (String logicalFunc : logicalFuncs) {
-//                for (int i = 0; i < arrayDimensionality; i++) {
-//                    String interval = getInterval(arrayDimensionality, i, upperBoundary);
-                    String query = String.format("SELECT c > 0 %s c < 500 FROM %s AS c", logicalFunc, arrayName, arrayName);
-                    if (logicalFunc.equals("not"))
-                        query = String.format("SELECT %s(c < 500) FROM %s AS c", logicalFunc, arrayName, arrayName);
+                String query = String.format("SELECT c > 0 %s c < 500 FROM %s AS c", logicalFunc, arrayName, arrayName);
+                if (logicalFunc.equals("not"))
+                    query = String.format("SELECT %s(c < 500) FROM %s AS c", logicalFunc, arrayName, arrayName);
 
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("COMPARISON OPERATORS ON EACH DIMENSION (out of %d)"
-                            , arrayDimensionality));
+                    String.format("COMPARISON OPERATORS (%dD)", arrayDimensionality));
             for (String comparisonFunc : comparisonFuncs) {
-//                for (int i = 0; i < arrayDimensionality; i++) {
-//                    String interval = getInterval(arrayDimensionality, i, upperBoundary);
-                    String query = String.format("SELECT c %s %d FROM %s AS c", comparisonFunc, comparisonNumber, arrayName);
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+                String query = String.format("SELECT c %s %d FROM %s AS c", comparisonFunc, comparisonNumber, arrayName);
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("TRIGONOMETRIC OPERATORS ON EACH DIMENSION (out of %d)"
-                            , arrayDimensionality));
+                    String.format("TRIGONOMETRIC OPERATORS (%dD)", arrayDimensionality));
             for (String trigonometricFunc : trigonometricFuncs) {
-//                for (int i = 0; i < arrayDimensionality; i++) {
-//                    String interval = getInterval(arrayDimensionality, i, upperBoundary);
-                    String query = String.format("SELECT %s(c) FROM %s AS c", trigonometricFunc, arrayName);
+                String query = String.format("SELECT %s(c) FROM %s AS c", trigonometricFunc, arrayName);
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+            }
+            ret.add(benchmarkSession);
+        }
+
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession(
+                    String.format("STACK ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) FOR CACHING (%dD)", arrayDimensionality));
+
+            for (String algebraicFunc : algebraicFuncs2) {
+                String expr = "c";
+                for (int i = 0; i < 10; i++) {
+                    String query = String.format("SELECT %s FROM %s AS c", expr, arrayName);
+                    expr += algebraicFunc + "c";
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                }
+
+                }
             }
             ret.add(benchmarkSession);
         }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("SIMPLE SELECT");
-//            String interval = getInterval(arrayDimensionality, 0, upperBoundary);
             String query = String.format("SELECT c FROM %s AS c", arrayName);
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             ret.add(benchmarkSession);
@@ -306,7 +217,6 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNC");
             for (String algebraicFunc : algebraicFuncs2) {
                 query = String.format("SELECT c %s 2 FROM %s AS c", algebraicFunc, arrayName);
-//                query = "SELECT d1 %s 2 AS dim1 FROM %s";
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
             ret.add(benchmarkSession);
@@ -315,14 +225,12 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             for (String algebraicFunc : algebraicFuncs2) {
                 for (String comparisonFunc : comparisonFuncs) {
                     query = String.format("SELECT c %s 2 %s 500 FROM %s AS c", algebraicFunc, comparisonFunc, arrayName);
-//                    query = "SELECT d1 %s 2 %s 500 AS dim1 FROM %s";
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
             }
             ret.add(benchmarkSession);
 
             if (arrayDimensionality >= 2) {
-//                interval = getInterval2D(arrayDimensionality, 0, 1, upperBoundary);
                 benchmarkSession = new BenchmarkSession("SIMPLE SELECT >=2 D");
                 query = String.format("SELECT c FROM %s AS c", arrayName);
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
