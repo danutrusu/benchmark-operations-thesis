@@ -21,9 +21,9 @@ public abstract class OperationsBenchmarkDataManager<T> extends DataManager<T> {
 
     public static final int CELL_TYPE_SIZE = 8;
 
-    public static final int BAND_WIDTH = 1024;//11312;
-    public static final int BAND_HEIGHT = 1024;//11312;
-    public static final int ARRAY_SIZE = BAND_WIDTH * BAND_HEIGHT * CELL_TYPE_SIZE;
+    public static final int BAND_WIDTH = 32768;//11312;
+    public static final int BAND_HEIGHT = 32768;//11312;
+//    public static final long ARRAY_SIZE = BAND_WIDTH * BAND_HEIGHT * CELL_TYPE_SIZE;
 
     public static final String ARRAY_SIZE_SHORT = "1GB";
 
@@ -38,7 +38,7 @@ public abstract class OperationsBenchmarkDataManager<T> extends DataManager<T> {
         if (benchmarkContext.isGenerateData()) {
 //            for (int i = 0; i < ARRAY_NO; i++) {
             String fileName = benchmarkContext.getArrayName();
-            RandomDataGenerator dataGen = new RandomDataGenerator(ARRAY_SIZE, benchmarkContext.getDataDir(), fileName);
+            RandomDataGenerator dataGen = new RandomDataGenerator(benchmarkContext.getArraySize(), benchmarkContext.getDataDir(), fileName);
             String filePath = dataGen.getFilePath();
             log.debug("Generated benchmark data slice: " + filePath);
         }
