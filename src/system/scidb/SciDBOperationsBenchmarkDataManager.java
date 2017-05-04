@@ -29,36 +29,17 @@ public class SciDBOperationsBenchmarkDataManager extends OperationsBenchmarkData
         String dimensions = "";
         for (int i = 0; i < arrayDimensionality; ++i) {
             if (i == 0) {
-                dimensions += String.format("d%d=0:%d,%d,0", i + 1, BAND_WIDTH - 1, bound);
+//                dimensions += String.format("d%d=0:%d,%d,0", i + 1, BAND_WIDTH - 1, bound);
+                dimensions += String.format("d%d", i + 1);
+
             } else {
-                dimensions += ", " + String.format("d%d=0:%d,%d,0", i + 1, BAND_WIDTH - 1, bound);
+//                dimensions += ", " + String.format("d%d=0:%d,%d,0", i + 1, BAND_WIDTH - 1, bound);
+                dimensions += ", " + String.format("d%d", i + 1);
+
             }
         }
 
         createArray = String.format("CREATE ARRAY %s<v:%s>[%s];", arrayName, dataType, dimensions);
-//        switch(arrayDimensionality) {
-//            case 1: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0];",
-//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound);
-//                    break;
-//            case 2: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
-//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
-//                    break;
-//            case 3: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0];",
-//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
-//                    break;
-//            case 4: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
-//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
-//                    break;
-//            case 5: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
-//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
-//                break;
-//            case 6: createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0, d3=0:%d,%d,0, d4=0:%d,%d,0];",
-//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound, BAND_HEIGHT - 1, bound);
-//                break;
-//            default:createArray = String.format("CREATE ARRAY %s<v:%s>[d1=0:%d,%d,0, d2=0:%d,%d,0];",
-//                    arrayName, TYPE_BASE, BAND_WIDTH - 1, bound, BAND_HEIGHT - 1, bound);
-//        }
-
         return createArray;
     }
 
