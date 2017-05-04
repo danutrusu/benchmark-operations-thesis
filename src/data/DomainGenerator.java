@@ -80,10 +80,14 @@ public class DomainGenerator {
             case "bool":
                 bytes = 1;
                 break;
+            case "short":
+                bytes = 2;
+                break;
             case "float":
             case "long":
             case "int32":
             case "unsigned long":
+            case "unsigned":
             case "uint32":
                 bytes = 4;
                 break;

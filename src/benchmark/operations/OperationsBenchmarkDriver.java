@@ -69,6 +69,8 @@ public class OperationsBenchmarkDriver extends Driver {
 
         double maxSelectSize = config.getDouble("max_select_size");
         String dataType = config.getString("datatype");
+//        if (dataType.equals("unsigned_long"))
+//            dataType = "unsigned long";
         Pair<Long, String> tileSize = DomainUtil.parseSize(config.getString("tilesize"));
         int queries = config.getInt("queries");
         int repeat = config.getInt("repeat");

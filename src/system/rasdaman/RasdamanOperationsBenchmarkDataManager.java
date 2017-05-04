@@ -73,8 +73,10 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
 
         long insertTime = -1;
 
-        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize(), ((OperationsBenchmarkContext) benchmarkContext).getDataType());
-        long fileSize = domainGenerator.getFileSize(domainBoundaries,((OperationsBenchmarkContext) benchmarkContext).getDataType());
+        String dataType = ((OperationsBenchmarkContext) benchmarkContext).getDataType();
+
+        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize(), dataType);
+        long fileSize = domainGenerator.getFileSize(domainBoundaries, dataType);
 
         System.out.println(fileSize);
 
@@ -91,7 +93,9 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
 //            tileStructureDomain.add(Pair.of(0l, chunkSize));
 //        }
 
-        Pair<String, String> aChar = typeManager.createOperationsType(benchmarkContext.getArrayDimensionality(), ((OperationsBenchmarkContext) benchmarkContext).getDataType());
+//        if (dataType.equals("unsigned long"))
+//            dataType = "unsigned_long";
+        Pair<String, String> aChar = typeManager.createOperationsType(benchmarkContext.getArrayDimensionality(), dataType);
 
         String createCollectionQuery = String.format("CREATE COLLECTION %s %s", benchmarkContext.getArrayName(), aChar.getSecond());
         queryExecutor.executeTimedQuery(createCollectionQuery);
