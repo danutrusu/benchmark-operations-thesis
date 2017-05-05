@@ -18,6 +18,7 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
     private static final int TYPE_SIZE = 8;
     private static final String TYPE_MDD = "DoubleImage";
     private static final String TYPE_SET = "DoubleSet";
+    private static final long ONE_MB = 1048576l;
 
     private final RasdamanTypeManager typeManager;
 
@@ -78,30 +79,27 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize(), dataType);
         long fileSize = domainGenerator.getFileSize(domainBoundaries, dataType);
 
+        String tileBoundaries = domainGenerator.getTileDomainBoundariesOperations();
+
+
         System.out.println(fileSize);
 
         //long chunkSize = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), ((OperationsBenchmarkContext)benchmarkContext).getTileSize());
         long tileSize; //(long) Math.pow(chunkSize + 1l, benchmarkContext.getArrayDimensionality());
 //        fileSize *= 8;
-        tileSize = fileSize;
+        tileSize = ( benchmarkContext.getArraySize() * domainGenerator.getBytes(dataType))  / 100;
 
         dataGenerator = new RandomDataGenerator(fileSize, benchmarkContext.getDataDir());
         String filePath = dataGenerator.getFilePath();
 
-//        List<Pair<Long, Long>> tileStructureDomain = new ArrayList<>();
-//        for (int i = 0; i < benchmarkContext.getArrayDimensionality(); i++) {
-//            tileStructureDomain.add(Pair.of(0l, chunkSize));
-//        }
 
-//        if (dataType.equals("unsigned long"))
-//            dataType = "unsigned_long";
         Pair<String, String> aChar = typeManager.createOperationsType(benchmarkContext.getArrayDimensionality(), dataType);
 
         String createCollectionQuery = String.format("CREATE COLLECTION %s %s", benchmarkContext.getArrayName(), aChar.getSecond());
         queryExecutor.executeTimedQuery(createCollectionQuery);
 
-        String insertQuery = String.format("INSERT INTO %s VALUES $1 TILING REGULAR %s TILE SIZE %d",
-                benchmarkContext.getArrayName(), RasdamanQueryGenerator.convertToRasdamanDomain(domainBoundaries), tileSize);
+        String insertQuery = String.format("INSERT INTO %s VALUES $1 TILING ALIGNED %s TILE SIZE %d",
+                benchmarkContext.getArrayName(), tileBoundaries, tileSize);
         System.out.println("Executing insert query: " + insertQuery);
         insertTime = queryExecutor.executeTimedQuery(insertQuery,
                 "--mddtype", aChar.getFirst(),

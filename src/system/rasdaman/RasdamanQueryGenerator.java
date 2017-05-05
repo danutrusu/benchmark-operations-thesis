@@ -97,7 +97,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         String[] algebraicFuncs2 = {"+", "-", "*", "/"}; //TODO look for "%"
         String[] logicalFuncs = {"and", "or", "not"}; //TODO look for xor, currently error.
         String[] comparisonFuncs = {"<", "<=", "<>", "=", ">", ">="};
-        String[] trigonometricFuncs = {"sin", "cos", "tan", "arctan", "exp"}; //TODO error with arcsin and log
+        String[] trigonometricFuncs = {"sin", "cos", "tan", "arctan"}; //TODO error with arcsin and log //exp may ecceed out of range
 
         Benchmark ret = new Benchmark();
         int arrayDimensionality = benchmarkContext.getArrayDimensionality();
@@ -194,21 +194,21 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             ret.add(benchmarkSession);
         }
 
-//        {
-//            BenchmarkSession benchmarkSession = new BenchmarkSession(
-//                    String.format("STACK ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) FOR CACHING (%dD)", arrayDimensionality));
-//
-//            for (String algebraicFunc : algebraicFuncs2) {
-//                String expr = "c";
-//                for (int i = 0; i < 10; i++) {
-//                    String query = String.format("SELECT %s FROM %s AS c", expr, arrayName);
-//                    expr += algebraicFunc + "c";
-//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//
-//                }
-//            }
-//            ret.add(benchmarkSession);
-//        }
+        {
+            BenchmarkSession benchmarkSession = new BenchmarkSession(
+                    String.format("STACK ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) FOR CACHING (%dD)", arrayDimensionality));
+
+            for (String algebraicFunc : algebraicFuncs2) {
+                String expr = "c";
+                for (int i = 0; i < 10; i++) {
+                    String query = String.format("SELECT %s FROM %s AS c", expr, arrayName);
+                    expr += algebraicFunc + "c";
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+
+                }
+            }
+            ret.add(benchmarkSession);
+        }
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("SIMPLE SELECT");

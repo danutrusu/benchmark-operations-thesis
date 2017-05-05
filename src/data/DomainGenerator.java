@@ -50,6 +50,23 @@ public class DomainGenerator {
         return result;
     }
 
+    public String getTileDomainBoundariesOperations() {
+
+        String boundary = "0:*";
+//        List<Pair<Long, Long>> result = new ArrayList<>();
+        String result = "";
+        for (int i = 0; i < noOfDimensions; ++i) {
+            if (i == 0) {
+                result += boundary;
+            } else {
+                result += "," + boundary;
+            }
+        }
+
+        result = "[" + result + "]";
+        return result;
+    }
+
     public List<Pair<Long, Long>> getDomainBoundaries2D(long approxFileSize) {
         int dims = 2;
         double approxAxisSize = Math.pow(approxFileSize, 1 / ((double) dims));
