@@ -130,7 +130,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
             for (String algebraicFunc : algebraicFuncs2) {
                 String expr = "v";
                 for (int i = 0; i < 10; i++) {
-                    String query = String.format("SELECT %s FROM %s", expr, arrayName);
+                    String query = String.format("SELECT %s FROM %s WHERE v <> 0", expr, arrayName);
                     expr += algebraicFunc + "v";
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
 
