@@ -23,7 +23,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         String[] algebraicFuncs1 = {"sqrt(abs", "abs"};
         String[] algebraicFuncs2 = {"+", "-", "*", "/"};
         String[] comparisonFuncs = {"<", "<=", "<>", "=", ">", ">="};
-        String[] trigonometricFuncs = {"sin", "cos", "tan", "asin", "acos", "atan", "exp", "log"};
+        String[] trigonometricFuncs = {"sin", "cos", "tan", "atan"};
         String[] logicalFuncs = {"and", "or", "not"};
         String[] aggregateFuncs = {"min", "max", "sum", "avg"};
 
@@ -51,15 +51,17 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         }
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("AGGREGATE FUNCTIONS (min, max, sum, avg ) (%dD)"
-                            , arrayDimensionality));
+            if (arrayDimensionality >= 2) {
+                BenchmarkSession benchmarkSession = new BenchmarkSession(
+                        String.format("AGGREGATE FUNCTIONS (min, max, sum, avg ) (%dD)"
+                                , arrayDimensionality));
 
-            for (String aggregateFunc : aggregateFuncs) {
+                for (String aggregateFunc : aggregateFuncs) {
                     String query = String.format("SELECT %s(v) FROM %s", aggregateFunc, arrayName);
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                }
+                ret.add(benchmarkSession);
             }
-            ret.add(benchmarkSession);
         }
 
         {
