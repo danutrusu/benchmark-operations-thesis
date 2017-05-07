@@ -24,7 +24,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         String[] algebraicFuncs2 = {"+", "-", "*", "/"};
         String[] comparisonFuncs = {"<", "<=", "<>", "=", ">", ">="};
         String[] trigonometricFuncs = {"sin", "cos", "tan", "atan"};
-        String[] logicalFuncs = {"and", "or", "not"};
+        String[] logicalFuncs = {"and", "or"};
         String[] aggregateFuncs = {"min", "max", "sum", "avg"};
 
         Benchmark ret = new Benchmark();
