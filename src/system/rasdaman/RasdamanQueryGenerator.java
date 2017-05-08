@@ -105,31 +105,35 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize(), ((OperationsBenchmarkContext) benchmarkContext).getDataType());
         long upperBoundary = domainBoundaries.get(0).getSecond();
+        String dataType = ((OperationsBenchmarkContext)benchmarkContext).getDataType();
+
 
         System.out.println(arrayDimensionality + " " + upperBoundary);
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT (%dD)");
+            BenchmarkSession benchmarkSession = new BenchmarkSession(String.format("SELECT (%dD)", arrayDimensionality));
             String query = "SELECT c FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
         }
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("CASTING (%dD)");
+            BenchmarkSession benchmarkSession = new BenchmarkSession(String.format("CASTING (%dD)", arrayDimensionality));
             String query = "SELECT (float)c FROM %s AS c";
             benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
             ret.add(benchmarkSession);
         }
 
         {
-            if (arrayDimensionality > 1) {
+            if (arrayDimensionality >= 2) {
                 BenchmarkSession benchmarkSession = new BenchmarkSession(
                         String.format("AGGREGATE FUNCTIONS (min, max, sum, avg) (%dD)"
                                 , arrayDimensionality));
                 for (String aggregateFunc : aggregateFuncs) {
-                    String query = getMArrayQuery(arrayDimensionality, 0, upperBoundary, arrayName, aggregateFunc);
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                    if (!dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
+                        String query = getMArrayQuery(arrayDimensionality, 0, upperBoundary, arrayName, aggregateFunc);
+                        benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                    }
                 }
                 ret.add(benchmarkSession);
             }
@@ -147,11 +151,6 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
-//            ret.add(benchmarkSession);
-
-//            benchmarkSession = new BenchmarkSession(
-//                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)"
-//                            , arrayDimensionality));
 
             for (String algebraicFunc : algebraicFuncs2) {
                     String query = String.format("SELECT c %s c FROM %s AS c", algebraicFunc, arrayName);
@@ -245,16 +244,20 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
                 benchmarkSession = new BenchmarkSession("SELECT + with AGGREGATE FUNC");
                 for (String aggregateFunc : aggregateFuncs) {
-                    query = String.format("SELECT %s(c) + %s(c) FROM %s AS c", aggregateFunc, aggregateFunc, arrayName);
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                    if (!dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
+                        query = String.format("SELECT %s(c) + %s(c) FROM %s AS c", aggregateFunc, aggregateFunc, arrayName);
+                        benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                    }
                 }
                 ret.add(benchmarkSession);
 
                 benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with AGGREGATE FUNC and COMPARISON");
                 for (String aggregateFunc : aggregateFuncs) {
                     for (String comparisonFunc : comparisonFuncs) {
-                        query = String.format("SELECT %s(c) %s %s(c) FROM %s AS c", aggregateFunc, comparisonFunc, aggregateFunc, arrayName);
-                        benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                        if (!dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
+                            query = String.format("SELECT %s(c) %s %s(c) FROM %s AS c", aggregateFunc, comparisonFunc, aggregateFunc, arrayName);
+                            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                        }
                     }
                 }
                 ret.add(benchmarkSession);

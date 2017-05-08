@@ -80,10 +80,6 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
-//            ret.add(benchmarkSession);
-
-//            benchmarkSession = new BenchmarkSession(
-//                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)", arrayDimensionality));
 
             for (String algebraicFunc : algebraicFuncs2) {
                     String query = String.format("SELECT v %s v FROM %s WHERE v <> 0", algebraicFunc, arrayName);
