@@ -146,24 +146,24 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("SIMPLE SELECT");
             String query = "SELECT v AS att1 FROM %s";
-            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-            ret.add(benchmarkSession);
-
-            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNC");
-            for (String algebraicFunc : algebraicFuncs2) {
-                query = "SELECT v %s 2 AS att1 FROM %s";
-                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, algebraicFunc, arrayName)));
-            }
-            ret.add(benchmarkSession);
-
-            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNCs and COMPARISON FUNCs");
-            for (String algebraicFunc : algebraicFuncs2) {
-                for (String comparisonFunc : comparisonFuncs) {
-                    query = "SELECT v %s 2 %s 500 AS att1 FROM %s";
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, algebraicFunc, comparisonFunc, arrayName)));
-                }
-            }
-            ret.add(benchmarkSession);
+//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+//            ret.add(benchmarkSession);
+//
+//            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNC");
+//            for (String algebraicFunc : algebraicFuncs2) {
+//                query = "SELECT v %s 2 AS att1 FROM %s";
+//                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, algebraicFunc, arrayName)));
+//            }
+//            ret.add(benchmarkSession);
+//
+//            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNCs and COMPARISON FUNCs");
+//            for (String algebraicFunc : algebraicFuncs2) {
+//                for (String comparisonFunc : comparisonFuncs) {
+//                    query = "SELECT v %s 2 %s 500 AS att1 FROM %s";
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, algebraicFunc, comparisonFunc, arrayName)));
+//                }
+//            }
+//            ret.add(benchmarkSession);
 
 //            if (arrayDimensionality >= 2) {
                 benchmarkSession = new BenchmarkSession("SIMPLE SELECT 2 DIMENSIONS");

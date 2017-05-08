@@ -213,24 +213,24 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("SIMPLE SELECT");
             String query = String.format("SELECT c FROM %s AS c", arrayName);
-            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-            ret.add(benchmarkSession);
-
-            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNC");
-            for (String algebraicFunc : algebraicFuncs2) {
-                query = String.format("SELECT c %s 2 FROM %s AS c", algebraicFunc, arrayName);
-                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-            }
-            ret.add(benchmarkSession);
-
-            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNCs and COMPARISON FUNCs");
-            for (String algebraicFunc : algebraicFuncs2) {
-                for (String comparisonFunc : comparisonFuncs) {
-                    query = String.format("SELECT c %s 2 %s 500 FROM %s AS c", algebraicFunc, comparisonFunc, arrayName);
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-                }
-            }
-            ret.add(benchmarkSession);
+//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+//            ret.add(benchmarkSession);
+//
+//            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNC");
+//            for (String algebraicFunc : algebraicFuncs2) {
+//                query = String.format("SELECT c %s 2 FROM %s AS c", algebraicFunc, arrayName);
+//                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+//            }
+//            ret.add(benchmarkSession);
+//
+//            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNCs and COMPARISON FUNCs");
+//            for (String algebraicFunc : algebraicFuncs2) {
+//                for (String comparisonFunc : comparisonFuncs) {
+//                    query = String.format("SELECT c %s 2 %s 500 FROM %s AS c", algebraicFunc, comparisonFunc, arrayName);
+//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+//                }
+//            }
+//            ret.add(benchmarkSession);
 
 //            if (arrayDimensionality >= 2) {
                 benchmarkSession = new BenchmarkSession("SIMPLE SELECT >=2 D");
