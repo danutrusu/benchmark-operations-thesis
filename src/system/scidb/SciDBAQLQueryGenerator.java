@@ -80,7 +80,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
-            ret.add(benchmarkSession);
+//            ret.add(benchmarkSession);
 
             benchmarkSession = new BenchmarkSession(
                     String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)", arrayDimensionality));
@@ -165,7 +165,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
             }
             ret.add(benchmarkSession);
 
-            if (arrayDimensionality >= 2) {
+//            if (arrayDimensionality >= 2) {
                 benchmarkSession = new BenchmarkSession("SIMPLE SELECT 2 DIMENSIONS");
                 query = "SELECT v FROM %s";
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
@@ -204,7 +204,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
                     }
                 }
                 ret.add(benchmarkSession);
-            }
+//            }
         }
 
         return ret;

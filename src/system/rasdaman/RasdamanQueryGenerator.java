@@ -147,7 +147,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
             }
-            ret.add(benchmarkSession);
+//            ret.add(benchmarkSession);
 
             benchmarkSession = new BenchmarkSession(
                     String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)"
@@ -232,7 +232,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             }
             ret.add(benchmarkSession);
 
-            if (arrayDimensionality >= 2) {
+//            if (arrayDimensionality >= 2) {
                 benchmarkSession = new BenchmarkSession("SIMPLE SELECT >=2 D");
                 query = String.format("SELECT c FROM %s AS c", arrayName);
                 benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
@@ -267,7 +267,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
                     }
                 }
                 ret.add(benchmarkSession);
-            }
+//            }
         }
 
         return ret;
