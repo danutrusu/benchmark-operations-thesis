@@ -32,7 +32,7 @@ public class OperationsBenchmarkDriver extends Driver {
                                 'd', "dimensions", "Data dimensionality to be tested.").setList(true).setListSeparator(','),
                         new FlaggedOption("size", JSAP.STRING_PARSER, "1kB", JSAP.REQUIRED,
                                 'b', "sizes", "Data sizes to be tested, as a number followed by B,kB,MB,GB,TB,PB,EB.").setList(true).setListSeparator(','),
-                        new FlaggedOption("repeat", JSAP.INTEGER_PARSER, "5", JSAP.REQUIRED,
+                        new FlaggedOption("repeat", JSAP.INTEGER_PARSER, "3", JSAP.REQUIRED,
                                 'r', "repeat", "Times to repeat each test query."),
                         new FlaggedOption("queries", JSAP.INTEGER_PARSER, "6", JSAP.REQUIRED,
                                 'q', "queries", "Number of queries per query category."),

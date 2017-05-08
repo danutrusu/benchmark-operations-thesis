@@ -20,7 +20,7 @@ public class OperationsBenchmarkContext extends BenchmarkContext {
         this.maxSelectSizePercent = maxSelectSizePercent;
         this.tileSize = tileSize;
         this.queryNumber = queryNumber;
-        cleanQuery = false;
+        cleanQuery = true;
         updateArrayName();
 
     }
