@@ -95,7 +95,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
         String[] aggregateFuncs = {"min_cells", "max_cells", "add_cells", "avg_cells"};
         String[] algebraicFuncs1 = {"sqrt(abs", "abs"};
         String[] algebraicFuncs2 = {"+", "-", "*", "/"}; //TODO look for "%"
-        String[] logicalFuncs = {"and", "or", "not"}; //TODO look for xor, currently error.
+        String[] logicalFuncs = {"and", "or"}; //TODO look for xor, currently error.
         String[] comparisonFuncs = {"<", "<=", "<>", "=", ">", ">="};
         String[] trigonometricFuncs = {"sin", "cos", "tan", "arctan"}; //TODO error with arcsin and log //exp may ecceed out of range
 
@@ -137,7 +137,7 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs) (%dD)", arrayDimensionality));
+                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs, +, -, *, /) (%dD)", arrayDimensionality));
             for (String algebraicFunc : algebraicFuncs1) {
                 String query;
                 if (!algebraicFunc.equals("sqrt(abs"))
@@ -149,9 +149,9 @@ public class RasdamanQueryGenerator extends QueryGenerator {
             }
 //            ret.add(benchmarkSession);
 
-            benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)"
-                            , arrayDimensionality));
+//            benchmarkSession = new BenchmarkSession(
+//                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)"
+//                            , arrayDimensionality));
 
             for (String algebraicFunc : algebraicFuncs2) {
                     String query = String.format("SELECT c %s c FROM %s AS c", algebraicFunc, arrayName);

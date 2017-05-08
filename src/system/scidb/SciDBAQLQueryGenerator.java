@@ -70,7 +70,7 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
 
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs) (%dD)"
+                    String.format("ALGEBRAIC FUNCTIONS (sqrt(abs), abs, +, -, *, /) (%dD)"
                             , arrayDimensionality));
             for (String algebraicFunc : algebraicFuncs1) {
 
@@ -82,8 +82,8 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
             }
 //            ret.add(benchmarkSession);
 
-            benchmarkSession = new BenchmarkSession(
-                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)", arrayDimensionality));
+//            benchmarkSession = new BenchmarkSession(
+//                    String.format("ALGEBRAIC FUNCTIONS (+, -, *, / and remainder) (%dD)", arrayDimensionality));
 
             for (String algebraicFunc : algebraicFuncs2) {
                     String query = String.format("SELECT v %s v FROM %s WHERE v <> 0", algebraicFunc, arrayName);
