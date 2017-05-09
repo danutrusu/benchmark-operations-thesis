@@ -130,10 +130,11 @@ public class RasdamanQueryGenerator extends QueryGenerator {
                         String.format("AGGREGATE FUNCTIONS (min, max, sum, avg) (%dD)"
                                 , arrayDimensionality));
                 for (String aggregateFunc : aggregateFuncs) {
-                    if (!dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
-                        String query = getMArrayQuery(arrayDimensionality, 0, upperBoundary, arrayName, aggregateFunc);
-                        benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                    if (dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
+                        continue;
                     }
+                    String query = getMArrayQuery(arrayDimensionality, 0, upperBoundary, arrayName, aggregateFunc);
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
                 ret.add(benchmarkSession);
             }
@@ -244,20 +245,23 @@ public class RasdamanQueryGenerator extends QueryGenerator {
 
                 benchmarkSession = new BenchmarkSession("SELECT + with AGGREGATE FUNC");
                 for (String aggregateFunc : aggregateFuncs) {
-                    if (!dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
-                        query = String.format("SELECT %s(c) + %s(c) FROM %s AS c", aggregateFunc, aggregateFunc, arrayName);
-                        benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                    if (dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
+                        continue;
                     }
+                    query = String.format("SELECT %s(c) + %s(c) FROM %s AS c", aggregateFunc, aggregateFunc, arrayName);
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
                 }
                 ret.add(benchmarkSession);
 
                 benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with AGGREGATE FUNC and COMPARISON");
                 for (String aggregateFunc : aggregateFuncs) {
                     for (String comparisonFunc : comparisonFuncs) {
-                        if (!dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
-                            query = String.format("SELECT %s(c) %s %s(c) FROM %s AS c", aggregateFunc, comparisonFunc, aggregateFunc, arrayName);
-                            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+                        if (dataType.equals("char") && aggregateFunc.equals("avg_cells")) {
+                            continue;
                         }
+                        query = String.format("SELECT %s(c) %s %s(c) FROM %s AS c", aggregateFunc, comparisonFunc, aggregateFunc, arrayName);
+                        benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
+
                     }
                 }
                 ret.add(benchmarkSession);
@@ -270,7 +274,6 @@ public class RasdamanQueryGenerator extends QueryGenerator {
                     }
                 }
                 ret.add(benchmarkSession);
-//            }
         }
 
         return ret;
