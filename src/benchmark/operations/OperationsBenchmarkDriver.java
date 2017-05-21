@@ -13,13 +13,12 @@ import com.martiansoftware.jsap.SimpleJSAP;
 import java.io.IOException;
 
 /**
- * Created by danut on 23.03.17.
+ * Created by Danut Rusu on 23.03.17.
  */
 public class OperationsBenchmarkDriver extends Driver {
 
     @Override
     protected SimpleJSAP getCmdLineConfig(Class c) throws JSAPException {
-//        SimpleJSAP jsap = getCommonCmdLineConfig(c);
         SimpleJSAP jsap = new SimpleJSAP(
                 getMainName(c),
                 getDescription(),
@@ -69,15 +68,12 @@ public class OperationsBenchmarkDriver extends Driver {
 
         double maxSelectSize = config.getDouble("max_select_size");
         String dataType = config.getString("datatype");
-//        if (dataType.equals("unsigned_long"))
-//            dataType = "unsigned long";
         Pair<Long, String> tileSize = DomainUtil.parseSize(config.getString("tilesize"));
         int queries = config.getInt("queries");
         int repeat = config.getInt("repeat");
         String datadir = config.getString("datadir");
         int timeout = config.getInt("timeout");
 
-//        OperationsBenchmarkContext benchmarkContext = new OperationsBenchmarkContext(config.getString("datadir"));
         OperationsBenchmarkContext benchmarkContext = new OperationsBenchmarkContext(maxSelectSize, tileSize.getFirst(), queries, repeat, datadir, timeout);
         benchmarkContext.setLoadData(config.getBoolean("load"));
         benchmarkContext.setDropData(config.getBoolean("drop"));

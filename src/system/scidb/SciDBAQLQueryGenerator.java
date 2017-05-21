@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * @author George Merticariu
  * @author Dimitar Misev <misev@rasdaman.com>
+ * @author Danut Rusu
  */
 public class SciDBAQLQueryGenerator extends QueryGenerator {
 
@@ -32,12 +33,6 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         int arrayDimensionality = benchmarkContext.getArrayDimensionality();
         String arrayName = benchmarkContext.getArrayName();
         String dataType = ((OperationsBenchmarkContext)benchmarkContext).getDataType();
-//        DomainGenerator domainGenerator = new DomainGenerator(arrayDimensionality);
-//        List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize());
-//        long upperBoundary = domainBoundaries.get(0).getSecond();
-
-//        System.out.println(arrayDimensionality + "  " + upperBoundary + " " + benchmarkContext.getArraySize());
-
         {
             BenchmarkSession benchmarkSession = new BenchmarkSession("SELECT (%dD)");
             String query = "SELECT * FROM %s AS c";
@@ -59,13 +54,11 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
                                 , arrayDimensionality));
 
                 for (String aggregateFunc : aggregateFuncs) {
-//                    if (!dataType.equals("char") && aggregateFunc.equals("avg")) {
                     if (dataType.equals("char") && aggregateFunc.equals("avg")) {
                         continue;
                     }
                     String query = String.format("SELECT %s(v) FROM %s", aggregateFunc, arrayName);
                     benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(query));
-//                    }
                 }
                 ret.add(benchmarkSession);
             }
@@ -143,73 +136,48 @@ public class SciDBAQLQueryGenerator extends QueryGenerator {
         }
 
         {
-            BenchmarkSession benchmarkSession = new BenchmarkSession("SIMPLE SELECT");
-            String query = "SELECT v AS att1 FROM %s";
-//            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-//            ret.add(benchmarkSession);
-//
-//            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNC");
-//            for (String algebraicFunc : algebraicFuncs2) {
-//                query = "SELECT v %s 2 AS att1 FROM %s";
-//                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, algebraicFunc, arrayName)));
-//            }
-//            ret.add(benchmarkSession);
-//
-//            benchmarkSession = new BenchmarkSession("SELECT with ALGEBRAIC FUNCs and COMPARISON FUNCs");
-//            for (String algebraicFunc : algebraicFuncs2) {
-//                for (String comparisonFunc : comparisonFuncs) {
-//                    query = "SELECT v %s 2 %s 500 AS att1 FROM %s";
-//                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, algebraicFunc, comparisonFunc, arrayName)));
-//                }
-//            }
-//            ret.add(benchmarkSession);
+            BenchmarkSession benchmarkSession;
+            String query;
+            benchmarkSession = new BenchmarkSession("SIMPLE SELECT 2 DIMENSIONS");
+            query = "SELECT v FROM %s";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
 
-//            if (arrayDimensionality >= 2) {
-                benchmarkSession = new BenchmarkSession("SIMPLE SELECT 2 DIMENSIONS");
-                query = "SELECT v FROM %s";
-                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-                ret.add(benchmarkSession);
+            benchmarkSession = new BenchmarkSession("SIMPLE SELECT 2 DIMENSIONS");
+            query = "SELECT v + v FROM %s";
+            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
+            ret.add(benchmarkSession);
 
-                benchmarkSession = new BenchmarkSession("SIMPLE SELECT 2 DIMENSIONS");
-                query = "SELECT v + v FROM %s";
-                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, arrayName)));
-                ret.add(benchmarkSession);
+            benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with AGGREGATE FUNC");
+            for (String aggregateFunc : aggregateFuncs) {
+                if (dataType.equals("char") && aggregateFunc.equals("avg")) {
+                    continue;
+                }
+                query = "SELECT %s(v) + %s(v) FROM %s";
+                benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, aggregateFunc, aggregateFunc, arrayName)));
+            }
+            ret.add(benchmarkSession);
 
-                benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with AGGREGATE FUNC");
-                for (String aggregateFunc : aggregateFuncs) {
+            benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with AGGREGATE FUNC and COMPARISON");
+            for (String aggregateFunc : aggregateFuncs) {
+                for (String comparisonFunc : comparisonFuncs) {
                     if (dataType.equals("char") && aggregateFunc.equals("avg")) {
                         continue;
                     }
-//                    if (!dataType.equals("char") && aggregateFunc.equals("avg")) {
-                    query = "SELECT %s(v) + %s(v) FROM %s";
-                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, aggregateFunc, aggregateFunc, arrayName)));
-//                    }
+                    query = "SELECT %s(v) %s %s(v) FROM %s";
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, aggregateFunc, comparisonFunc, aggregateFunc, arrayName)));
                 }
-                ret.add(benchmarkSession);
+            }
+            ret.add(benchmarkSession);
 
-                benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with AGGREGATE FUNC and COMPARISON");
-                for (String aggregateFunc : aggregateFuncs) {
-                    for (String comparisonFunc : comparisonFuncs) {
-                        if (dataType.equals("char") && aggregateFunc.equals("avg")) {
-                            continue;
-                        }
-//                        if (!dataType.equals("char") && aggregateFunc.equals("avg")) {
-                            query = "SELECT %s(v) %s %s(v) FROM %s";
-                            benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, aggregateFunc, comparisonFunc, aggregateFunc, arrayName)));
-//                        }
-                    }
+            benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with TRIGONOMETRIC FUNC and COMPARISON");
+            for (String trigonometricFunc : trigonometricFuncs) {
+                for (String comparisonFunc : comparisonFuncs) {
+                    query = "SELECT %s(v) %s %s(v) FROM %s";
+                    benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, trigonometricFunc, comparisonFunc, trigonometricFunc, arrayName)));
                 }
-                ret.add(benchmarkSession);
-
-                benchmarkSession = new BenchmarkSession("SELECT 2 DIMENSIONS with TRIGONOMETRIC FUNC and COMPARISON");
-                for (String trigonometricFunc : trigonometricFuncs) {
-                    for (String comparisonFunc : comparisonFuncs) {
-                        query = "SELECT %s(v) %s %s(v) FROM %s";
-                        benchmarkSession.addBenchmarkQuery(new BenchmarkQuery(String.format(query, trigonometricFunc, comparisonFunc, trigonometricFunc, arrayName)));
-                    }
-                }
-                ret.add(benchmarkSession);
-//            }
+            }
+            ret.add(benchmarkSession);
         }
 
         return ret;

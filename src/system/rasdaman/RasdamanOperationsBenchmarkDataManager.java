@@ -11,14 +11,9 @@ import java.text.MessageFormat;
 import java.util.List;
 
 /**
- * Created by danut on 23.03.17.
+ * Created by Danut Rusu on 23.03.17.
  */
 public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkDataManager<RasdamanSystem> {
-
-    private static final int TYPE_SIZE = 8;
-    private static final String TYPE_MDD = "DoubleImage";
-    private static final String TYPE_SET = "DoubleSet";
-    private static final long ONE_MB = 1048576l;
 
     private final RasdamanTypeManager typeManager;
 
@@ -29,33 +24,6 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
         typeManager = new RasdamanTypeManager(queryExecutor);
     }
 
-//    @Override
-//    public long loadData() throws Exception {
-//        long totalTime = 0;
-//
-//        List<String> sliceFilePaths = getSliceFilePaths(benchmarkContext);
-//        for (int i = 0; i < sliceFilePaths.size(); i++) {
-//            String arrayName = benchmarkContext.getArrayNameN(i);
-//
-//            queryExecutor.executeTimedQuery(String.format("CREATE COLLECTION %s %s", arrayName, TYPE_SET));
-//
-//            long tileUpperBound = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), benchmarkContext.getTileSize() / TYPE_SIZE);
-//            String insertQuery = String.format("INSERT INTO %s VALUES $1 TILING REGULAR [0:%d,0:%d] TILE SIZE %d",
-//                    arrayName, tileUpperBound - 1, tileUpperBound - 1, tileUpperBound * tileUpperBound * TYPE_SIZE);
-
-//    String insertQuery = String.format("INSERT INTO %s VALUES $1 TILING ALIGNED %s TILE SIZE %d",
-//            benchmarkContext.getArrayName(), RasdamanQueryGenerator.convertToRasdamanDomain(tileStructureDomain), tileSize);
-//            String mddDomain = String.format("[0:%d,0:%d]", BAND_WIDTH - 1, BAND_HEIGHT - 1);
-//            totalTime += queryExecutor.executeTimedQuery(insertQuery,
-//                    "-f", sliceFilePaths.get(i),
-//                    "--mdddomain", mddDomain,
-//                    "--mddtype", TYPE_MDD
-//            );
-//        }
-//
-//        return totalTime;
-//    }
-
     @Override
     public long loadData() throws Exception {
         StopWatch timer = new StopWatch();
@@ -64,16 +32,7 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
     }
 
     private void loadOperationsBenchmarkData() throws Exception {
-//        int slices = (int) (benchmarkContext.getArraySize() / (DomainUtil.SIZE_1GB));
-
-//        boolean startSequentialUpdate = false;
-//        if (benchContext.getCollSize() > DomainUtil.SIZE_1GB) {
-//            benchContext.setCollSize(DomainUtil.SIZE_1GB);
-//            startSequentialUpdate = true;
-//        }
-
-        long insertTime = -1;
-
+        long insertTime;
         String dataType = ((OperationsBenchmarkContext) benchmarkContext).getDataType();
 
         List<Pair<Long, Long>> domainBoundaries = domainGenerator.getDomainBoundaries(benchmarkContext.getArraySize(), dataType);
@@ -84,10 +43,7 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
 
         System.out.println(fileSize);
 
-        //long chunkSize = DomainUtil.getDimensionUpperBound(benchmarkContext.getArrayDimensionality(), ((OperationsBenchmarkContext)benchmarkContext).getTileSize());
-        long tileSize; //(long) Math.pow(chunkSize + 1l, benchmarkContext.getArrayDimensionality());
-//        fileSize *= 8;
-        tileSize = ( benchmarkContext.getArraySize() * domainGenerator.getBytes(dataType))  / 100;
+        long tileSize = ( benchmarkContext.getArraySize() * domainGenerator.getBytes(dataType))  / 100;
 
         dataGenerator = new RandomDataGenerator(fileSize, benchmarkContext.getDataDir());
         String filePath = dataGenerator.getFilePath();
@@ -105,19 +61,6 @@ public class RasdamanOperationsBenchmarkDataManager extends OperationsBenchmarkD
                 "--mddtype", aChar.getFirst(),
                 "--mdddomain", RasdamanQueryGenerator.convertToRasdamanDomain(domainBoundaries),
                 "--file", filePath);
-
-//        File resultsDir = IO.getResultsDir();
-//        File insertResultFile = new File(resultsDir.getAbsolutePath(), "rasdaman_insert_results.csv");
-//
-////        if (startSequentialUpdate) {
-////            insertTime = updateCollection(slices);
-////        }
-//
-//        IO.appendLineToFile(insertResultFile.getAbsolutePath(), String.format("\"%s\", \"%d\", \"%d\", \"%d\", \"%d\"",
-//                benchmarkContext.getArrayName(), fileSize*slices, 1l, benchmarkContext.getArrayDimensionality(), insertTime));
-
-//        return insertTime;
-
     }
 
     @Override

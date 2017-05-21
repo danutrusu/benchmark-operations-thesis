@@ -6,14 +6,10 @@ import benchmark.QueryExecutor;
 import data.RandomDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.IO;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
- * Created by danut on 23.03.17.
+ * Created by Danut Rusu on 23.03.17.
  */
 public abstract class OperationsBenchmarkDataManager<T> extends DataManager<T> {
 
@@ -36,37 +32,10 @@ public abstract class OperationsBenchmarkDataManager<T> extends DataManager<T> {
     @Override
     public void generateData() throws Exception {
         if (benchmarkContext.isGenerateData()) {
-//            for (int i = 0; i < ARRAY_NO; i++) {
             String fileName = benchmarkContext.getArrayName();
             RandomDataGenerator dataGen = new RandomDataGenerator(benchmarkContext.getArraySize(), benchmarkContext.getDataDir(), fileName);
             String filePath = dataGen.getFilePath();
             log.debug("Generated benchmark data slice: " + filePath);
         }
-//        }
-    }
-
-//    @Override
-//    public void generateData() throws Exception {
-//        if (benchmarkContext.isGenerateData()) {
-//            for (int i = 0; i < ARRAY_NO; i++) {
-//                String fileName = benchmarkContext.getArrayNameN(i);
-//                RandomDataGenerator dataGen = new RandomDataGenerator(ARRAY_SIZE, benchmarkContext.getDataDir(), fileName);
-//                String filePath = dataGen.getFilePath();
-//                log.debug("Generated benchmark data slice: " + filePath);
-//            }
-//        }
-//    }
-
-    protected List<String> getSliceFilePaths(BenchmarkContext benchmarkContext) {
-        List<String> ret = new ArrayList<>();
-        for (int i = 0; i < ARRAY_NO; i++) {
-            String fileName = benchmarkContext.getArrayNameN(i);
-            String sliceFilePath = IO.concatPaths(benchmarkContext.getDataDir(), fileName);
-            if (!IO.fileExists(sliceFilePath)) {
-                break;
-            }
-            ret.add(sliceFilePath);
-        }
-        return ret;
     }
 }
